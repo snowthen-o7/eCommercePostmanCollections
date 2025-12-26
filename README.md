@@ -6,12 +6,19 @@ A comprehensive set of Postman collections for popular e-commerce platform APIs.
 
 | Collection | Requests | Description |
 |------------|----------|-------------|
-| [Shopify GraphQL API](#shopify-graphql-api) | 35 | Full GraphQL Admin API coverage |
+| [Shopify GraphQL API](#shopify-graphql-api) | 30 | Full GraphQL Admin API coverage |
 | [Shopify REST API](#shopify-rest-api) | 19 | REST Admin API endpoints |
-| [BigCommerce API](#bigcommerce-api) | 4 | Catalog API |
-| [WooCommerce API](#woocommerce-api) | 2 | Products API |
+| [BigCommerce API](#bigcommerce-api) | 15 | Store, Catalog, Orders, Customers API |
+| [WooCommerce API](#woocommerce-api) | 19 | Full REST API v3 coverage |
 | [Magento API](#magento-api) | 2 | Catalog API |
 | [TrustPilot API](#trustpilot-api) | 3 | Product reviews API |
+
+## Features
+
+- **Automatic ID Extraction**: List endpoints automatically extract IDs for use in subsequent "get by ID" requests
+- **Smart Skip Logic**: Tests skip gracefully when required IDs or credentials aren't available
+- **No False Failures**: Tests pass when credentials aren't configured (skipped instead of failed)
+- **Cross-Platform**: Includes both bash (`run-tests.sh`) and PowerShell (`run-tests.ps1`) test runners
 
 ## Quick Start
 
@@ -122,14 +129,18 @@ Uses `X-Shopify-Access-Token` header with your Admin API token.
 
 ## BigCommerce API
 
-BigCommerce Catalog API v3.
+BigCommerce REST API v2/v3 with comprehensive catalog, order, and customer coverage.
 
-### Endpoints
+### Structure
 
-- List Products
-- Get Product by ID
-- List Variants
-- Get Variant by ID
+```
+📁 Store (1)              - Store information
+📁 Products & Variants (4) - Products, variants with ID extraction
+📁 Categories (3)         - Categories and category tree
+📁 Brands (2)             - Brand management
+📁 Customers (2)          - Customer queries
+📁 Orders (3)             - Orders and order products
+```
 
 ### Authentication
 
@@ -138,23 +149,54 @@ Set these environment variables:
 - `bigcommerce_token` - API token (`X-Auth-Token`)
 - `bigcommerce_client_id` - Client ID (`X-Auth-Client`)
 
+### Auto-Extracted IDs
+
+The collection automatically extracts and chains:
+- `bigcommerce_product_id` → from List Products
+- `bigcommerce_variant_id` → from List Products
+- `bigcommerce_category_id` → from List Categories
+- `bigcommerce_brand_id` → from List Brands
+- `bigcommerce_customer_id` → from List Customers
+- `bigcommerce_order_id` → from List Orders
+
 ---
 
 ## WooCommerce API
 
-WooCommerce REST API for WordPress stores.
+WooCommerce REST API v3 with comprehensive store coverage.
 
-### Endpoints
+### Structure
 
-- List Products (v3)
-- List Products (Legacy v2)
+```
+📁 System (1)           - System status and environment info
+📁 Products (4)         - Products and variations with ID extraction
+📁 Categories (2)       - Product categories
+📁 Orders (3)           - Orders and order notes
+📁 Customers (2)        - Customer management
+📁 Coupons (2)          - Coupon management
+📁 Shipping (2)         - Shipping zones and methods
+📁 Payment Gateways (1) - Payment gateway configuration
+📁 Tax (2)              - Tax classes and rates
+```
 
 ### Authentication
 
-Uses HTTP Basic Auth with consumer key/secret:
+Uses query string authentication:
 - `woo_store_url` - Full store URL (e.g., `https://mystore.com`)
 - `woo_consumer_key` - Consumer key (`ck_...`)
 - `woo_consumer_secret` - Consumer secret (`cs_...`)
+
+### Auto-Extracted IDs
+
+The collection automatically extracts and chains:
+- `woo_product_id` → from List Products
+- `woo_variable_product_id` → from List Products (first variable product)
+- `woo_variation_id` → from List Product Variations
+- `woo_category_id` → from List Categories
+- `woo_order_id` → from List Orders
+- `woo_customer_id` → from List Customers
+- `woo_coupon_id` → from List Coupons
+- `woo_shipping_zone_id` → from List Shipping Zones
 
 ---
 
@@ -220,8 +262,12 @@ All variables use platform prefixes for clarity. The environment file is organiz
 | `bigcommerce_store_hash` | ✅ | Store hash from API path |
 | `bigcommerce_token` | ✅ | API access token (X-Auth-Token) |
 | `bigcommerce_client_id` | ✅ | API client ID (X-Auth-Client) |
-| `bigcommerce_product_id` | | Product ID for testing |
-| `bigcommerce_variant_id` | | Variant ID |
+| `bigcommerce_product_id` | Auto | Product ID (extracted from List Products) |
+| `bigcommerce_variant_id` | Auto | Variant ID (extracted from List Products) |
+| `bigcommerce_category_id` | Auto | Category ID (extracted from List Categories) |
+| `bigcommerce_brand_id` | Auto | Brand ID (extracted from List Brands) |
+| `bigcommerce_customer_id` | Auto | Customer ID (extracted from List Customers) |
+| `bigcommerce_order_id` | Auto | Order ID (extracted from List Orders) |
 
 ### WooCommerce
 
@@ -230,6 +276,14 @@ All variables use platform prefixes for clarity. The environment file is organiz
 | `woo_store_url` | ✅ | Full store URL with protocol |
 | `woo_consumer_key` | ✅ | Consumer key (`ck_...`) |
 | `woo_consumer_secret` | ✅ | Consumer secret (`cs_...`) |
+| `woo_product_id` | Auto | Product ID (extracted from List Products) |
+| `woo_variable_product_id` | Auto | Variable product ID (extracted from List Products) |
+| `woo_variation_id` | Auto | Variation ID (extracted from List Variations) |
+| `woo_category_id` | Auto | Category ID (extracted from List Categories) |
+| `woo_order_id` | Auto | Order ID (extracted from List Orders) |
+| `woo_customer_id` | Auto | Customer ID (extracted from List Customers) |
+| `woo_coupon_id` | Auto | Coupon ID (extracted from List Coupons) |
+| `woo_shipping_zone_id` | Auto | Shipping zone ID (extracted from List Zones) |
 
 ### Magento
 
@@ -271,14 +325,34 @@ npm install -g newman newman-reporter-htmlextra
 # Copy and configure credentials
 cp .env.example .env
 # Edit .env with your credentials
+```
 
+**Linux/macOS (bash):**
+```bash
 # Run all tests
 ./run-tests.sh
 
 # Run specific platform
-./run-tests.sh shopify-graphql
+./run-tests.sh shopify          # Shopify GraphQL only
+./run-tests.sh shopify-all      # Both Shopify collections
 ./run-tests.sh bigcommerce
 ./run-tests.sh woocommerce
+./run-tests.sh magento
+./run-tests.sh trustpilot
+```
+
+**Windows (PowerShell):**
+```powershell
+# Run all tests
+.\run-tests.ps1
+
+# Run specific platform
+.\run-tests.ps1 shopify         # Shopify GraphQL only
+.\run-tests.ps1 shopify-all     # Both Shopify collections
+.\run-tests.ps1 bigcommerce
+.\run-tests.ps1 woocommerce
+.\run-tests.ps1 magento
+.\run-tests.ps1 trustpilot
 ```
 
 ### Test Reports
@@ -313,9 +387,16 @@ This repository includes a GitHub Actions workflow (`.github/workflows/api-tests
 
 Each request validates:
 - **Status Code**: 2xx response
-- **Response Time**: Under 10 seconds
+- **Response Time**: Under 5 seconds
 - **JSON Validity**: Valid JSON when Content-Type is application/json
 - **GraphQL Errors**: No errors in GraphQL response body (Shopify GraphQL only)
+
+### Smart Skip Logic
+
+Tests automatically skip (instead of failing) when:
+- **Credentials not configured**: Platform credentials are empty or placeholder values
+- **Required IDs not available**: "Get by ID" endpoints skip when list endpoints returned no data
+- **Optional features missing**: e.g., no variable products, no orders, no customers
 
 ---
 
