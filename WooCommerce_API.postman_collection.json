@@ -2,181 +2,967 @@
 	"info": {
 		"_postman_id": "woocommerce-rest-api-20251210",
 		"name": "WooCommerce REST API",
-		"description": "# WooCommerce REST API\n\nREST API endpoints for WooCommerce stores.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `woo_store_url` | \u2705 | Full store URL (e.g., `https://mystore.com`) |\n| `woo_consumer_key` | \u2705 | REST API consumer key (`ck_...`) |\n| `woo_consumer_secret` | \u2705 | REST API consumer secret (`cs_...`) |\n\n### 2. Generate API Keys\n\n1. Go to WooCommerce \u2192 Settings \u2192 Advanced \u2192 REST API\n2. Click \"Add key\"\n3. Set permissions (Read/Write)\n4. Generate and copy the Consumer Key and Consumer Secret\n\n### 3. Authentication\n\nUses HTTP Basic Authentication with consumer key as username and consumer secret as password.\n\n\n\n## Variables\n\nThis collection includes pre-defined variables. You can set them in two ways:\n\n**Option 1: Collection Variables (Quick Start)**\n1. Click on the collection name\n2. Go to the \"Variables\" tab\n3. Fill in the \"Current value\" column\n\n**Option 2: Environment Variables (Recommended for multiple stores)**\n1. Import `Ecommerce_APIs.postman_environment.json`\n2. Fill in your values\n3. Select the environment in Postman\n\nEnvironment variables override collection variables, so you can use both.\n\n## Endpoints\n\n| Request | Description |\n|---------|-------------|\n| List Products | Get all products (API v3) |\n| List Products (Legacy) | Get all products (API v2) |\n\n## API Documentation\n\nhttps://woocommerce.github.io/woocommerce-rest-api-docs/\n",
+		"description": "# WooCommerce REST API\n\nREST API endpoints for WooCommerce stores.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `woo_store_url` | ✅ | Full store URL (e.g., `https://mystore.com`) |\n| `woo_consumer_key` | ✅ | REST API consumer key (`ck_...`) |\n| `woo_consumer_secret` | ✅ | REST API consumer secret (`cs_...`) |\n\n### 2. Generate API Keys\n\n1. Go to WooCommerce → Settings → Advanced → REST API\n2. Click \"Add key\"\n3. Set permissions (Read/Write)\n4. Generate and copy the Consumer Key and Consumer Secret\n\n### 3. Authentication\n\nUses query string authentication with consumer_key and consumer_secret parameters.\n\n## Endpoints\n\n### System\n- System Status\n\n### Products\n- List Products\n- Get Product by ID\n- List Product Variations\n- Get Variation by ID\n\n### Categories\n- List Categories\n- Get Category by ID\n\n### Orders\n- List Orders\n- Get Order by ID\n\n### Customers\n- List Customers\n- Get Customer by ID\n\n### Coupons\n- List Coupons\n- Get Coupon by ID\n\n## API Documentation\n\nhttps://woocommerce.github.io/woocommerce-rest-api-docs/\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Legacy",
+			"name": "System",
 			"item": [
 				{
-					"name": "List Products",
+					"name": "System Status",
 					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "{{woo_consumer_secret}}",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "{{woo_consumer_key}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{woo_store_url}}/wc-api/v3/products?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
-							"host": [
-								"{{woo_store_url}}"
-							],
-							"path": [
-								"wc-api",
-								"v3",
-								"products"
-							],
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/system_status?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "system_status"],
 							"query": [
-								{
-									"key": "consumer_key",
-									"value": "{{woo_consumer_key}}"
-								},
-								{
-									"key": "consumer_secret",
-									"value": "{{woo_consumer_secret}}"
-								}
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
 							]
-						}
+						},
+						"description": "Get WooCommerce system status and environment info"
 					},
-					"response": [],
-					"description": "GET request - Add description here",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"// Standard response validation",
-									"pm.test(\"Status code is successful\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Response time is acceptable\", function () {",
+									"pm.test('Response time is acceptable', function () {",
 									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
 									"});",
 									"",
-									"// Parse JSON if available",
-									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
-									"    pm.test(\"Response is valid JSON\", function () {",
-									"        pm.response.to.be.json;",
-									"    });",
-									"}"
+									"pm.test('Response has environment data', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('environment');",
+									"});"
 								]
 							}
 						}
 					]
 				}
 			],
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"// Standard response validation",
-							"pm.test(\"Status code is successful\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
-							"});",
-							"",
-							"pm.test(\"Response time is acceptable\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-							"});",
-							"",
-							"// Parse JSON if available",
-							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
-							"    pm.test(\"Response is valid JSON\", function () {",
-							"        pm.response.to.be.json;",
-							"    });",
-							"}"
-						]
-					}
-				}
-			]
+			"description": "System status and health endpoints"
 		},
 		{
-			"name": "List Products",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{woo_store_url}}/wp-json/wc/v2/products?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
-					"host": [
-						"{{woo_store_url}}"
-					],
-					"path": [
-						"wp-json",
-						"wc",
-						"v2",
-						"products"
-					],
-					"query": [
-						{
-							"key": "consumer_key",
-							"value": "{{woo_consumer_key}}"
+			"name": "Products",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/products?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}&per_page=10",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "products"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"},
+								{"key": "per_page", "value": "10"}
+							]
 						},
+						"description": "List all products"
+					},
+					"event": [
 						{
-							"key": "consumer_secret",
-							"value": "{{woo_consumer_secret}}"
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first product ID for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        const firstProduct = response[0];",
+									"        pm.environment.set('woo_product_id', firstProduct.id);",
+									"        console.log('Extracted product_id:', firstProduct.id);",
+									"        ",
+									"        // Check for variable product to get variations",
+									"        const variableProduct = response.find(p => p.type === 'variable');",
+									"        if (variableProduct) {",
+									"            pm.environment.set('woo_variable_product_id', variableProduct.id);",
+									"            console.log('Extracted variable_product_id:', variableProduct.id);",
+									"        }",
+									"    }",
+									"} catch(e) { console.log('Error extracting IDs:', e); }"
+								]
+							}
 						}
 					]
 				},
-				"description": "https://woocommerce.github.io/woocommerce-rest-api-docs/#products"
-			},
-			"response": [],
-			"description": "GET request - Add description here",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"// Standard response validation",
-							"pm.test(\"Status code is successful\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
-							"});",
-							"",
-							"pm.test(\"Response time is acceptable\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-							"});",
-							"",
-							"// Parse JSON if available",
-							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
-							"    pm.test(\"Response is valid JSON\", function () {",
-							"        pm.response.to.be.json;",
-							"    });",
-							"}"
-						]
-					}
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/products/{{woo_product_id}}?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "products", "{{woo_product_id}}"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "Get a single product by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.environment.get('woo_product_id');",
+									"if (!productId) {",
+									"    console.log('Skipping: woo_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Product Variations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/products/{{woo_variable_product_id}}/variations?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "products", "{{woo_variable_product_id}}", "variations"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all variations for a variable product"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.environment.get('woo_variable_product_id');",
+									"if (!productId) {",
+									"    console.log('Skipping: woo_variable_product_id not set (no variable products found)');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first variation ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('woo_variation_id', response[0].id);",
+									"        console.log('Extracted variation_id:', response[0].id);",
+									"    }",
+									"} catch(e) { console.log('Error extracting variation ID:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Variation by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/products/{{woo_variable_product_id}}/variations/{{woo_variation_id}}?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "products", "{{woo_variable_product_id}}", "variations", "{{woo_variation_id}}"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "Get a single product variation by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.environment.get('woo_variable_product_id');",
+									"const variationId = pm.environment.get('woo_variation_id');",
+									"if (!productId || !variationId) {",
+									"    console.log('Skipping: woo_variable_product_id or woo_variation_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
 				}
-			]
+			],
+			"description": "Product endpoints"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/products/categories?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}&per_page=50",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "products", "categories"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"},
+								{"key": "per_page", "value": "50"}
+							]
+						},
+						"description": "List all product categories"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first category ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('woo_category_id', response[0].id);",
+									"        console.log('Extracted category_id:', response[0].id);",
+									"    }",
+									"} catch(e) { console.log('Error extracting category ID:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/products/categories/{{woo_category_id}}?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "products", "categories", "{{woo_category_id}}"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "Get a single category by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const categoryId = pm.environment.get('woo_category_id');",
+									"if (!categoryId) {",
+									"    console.log('Skipping: woo_category_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Product category endpoints"
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/orders?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}&per_page=10",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "orders"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"},
+								{"key": "per_page", "value": "10"}
+							]
+						},
+						"description": "List all orders"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first order ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('woo_order_id', response[0].id);",
+									"        console.log('Extracted order_id:', response[0].id);",
+									"    }",
+									"} catch(e) { console.log('Error extracting order ID:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/orders/{{woo_order_id}}?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "orders", "{{woo_order_id}}"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "Get a single order by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const orderId = pm.environment.get('woo_order_id');",
+									"if (!orderId) {",
+									"    console.log('Skipping: woo_order_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Order Notes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/orders/{{woo_order_id}}/notes?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "orders", "{{woo_order_id}}", "notes"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all notes for an order"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const orderId = pm.environment.get('woo_order_id');",
+									"if (!orderId) {",
+									"    console.log('Skipping: woo_order_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Order endpoints"
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "List Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/customers?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}&per_page=10",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "customers"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"},
+								{"key": "per_page", "value": "10"}
+							]
+						},
+						"description": "List all customers"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first customer ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('woo_customer_id', response[0].id);",
+									"        console.log('Extracted customer_id:', response[0].id);",
+									"    }",
+									"} catch(e) { console.log('Error extracting customer ID:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Customer by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/customers/{{woo_customer_id}}?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "customers", "{{woo_customer_id}}"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "Get a single customer by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const customerId = pm.environment.get('woo_customer_id');",
+									"if (!customerId) {",
+									"    console.log('Skipping: woo_customer_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Customer endpoints"
+		},
+		{
+			"name": "Coupons",
+			"item": [
+				{
+					"name": "List Coupons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/coupons?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}&per_page=10",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "coupons"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"},
+								{"key": "per_page", "value": "10"}
+							]
+						},
+						"description": "List all coupons"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first coupon ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('woo_coupon_id', response[0].id);",
+									"        console.log('Extracted coupon_id:', response[0].id);",
+									"    }",
+									"} catch(e) { console.log('Error extracting coupon ID:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Coupon by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/coupons/{{woo_coupon_id}}?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "coupons", "{{woo_coupon_id}}"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "Get a single coupon by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const couponId = pm.environment.get('woo_coupon_id');",
+									"if (!couponId) {",
+									"    console.log('Skipping: woo_coupon_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Coupon endpoints"
+		},
+		{
+			"name": "Shipping",
+			"item": [
+				{
+					"name": "List Shipping Zones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/shipping/zones?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "shipping", "zones"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all shipping zones"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first shipping zone ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('woo_shipping_zone_id', response[0].id);",
+									"        console.log('Extracted shipping_zone_id:', response[0].id);",
+									"    }",
+									"} catch(e) { console.log('Error extracting shipping zone ID:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Shipping Methods",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/shipping_methods?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "shipping_methods"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all shipping methods"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Shipping endpoints"
+		},
+		{
+			"name": "Payment Gateways",
+			"item": [
+				{
+					"name": "List Payment Gateways",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/payment_gateways?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "payment_gateways"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all payment gateways"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Payment gateway endpoints"
+		},
+		{
+			"name": "Tax",
+			"item": [
+				{
+					"name": "List Tax Classes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/taxes/classes?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "taxes", "classes"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all tax classes"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Tax Rates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wp-json/wc/v3/taxes?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": ["{{woo_store_url}}"],
+							"path": ["wp-json", "wc", "v3", "taxes"],
+							"query": [
+								{"key": "consumer_key", "value": "{{woo_consumer_key}}"},
+								{"key": "consumer_secret", "value": "{{woo_consumer_secret}}"}
+							]
+						},
+						"description": "List all tax rates"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Tax endpoints"
 		}
 	],
 	"event": [
@@ -195,7 +981,7 @@
 					"const hasConsumerSecret = consumerSecret && consumerSecret.trim() !== '' && !consumerSecret.startsWith('cs_xxxx');",
 					"",
 					"if (!hasStoreUrl || !hasConsumerKey || !hasConsumerSecret) {",
-					"    console.log('⏭️ Skipping: WooCommerce credentials not configured');",
+					"    console.log('Skipping: WooCommerce credentials not configured');",
 					"    console.log('   Set woo_store_url, woo_consumer_key, and woo_consumer_secret to run this test');",
 					"    pm.execution.skipRequest();",
 					"}",
