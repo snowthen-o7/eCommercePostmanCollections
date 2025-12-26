@@ -1,0 +1,238 @@
+{
+	"info": {
+		"_postman_id": "woocommerce-rest-api-20251210",
+		"name": "WooCommerce REST API",
+		"description": "# WooCommerce REST API\n\nREST API endpoints for WooCommerce stores.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `woo_store_url` | \u2705 | Full store URL (e.g., `https://mystore.com`) |\n| `woo_consumer_key` | \u2705 | REST API consumer key (`ck_...`) |\n| `woo_consumer_secret` | \u2705 | REST API consumer secret (`cs_...`) |\n\n### 2. Generate API Keys\n\n1. Go to WooCommerce \u2192 Settings \u2192 Advanced \u2192 REST API\n2. Click \"Add key\"\n3. Set permissions (Read/Write)\n4. Generate and copy the Consumer Key and Consumer Secret\n\n### 3. Authentication\n\nUses HTTP Basic Authentication with consumer key as username and consumer secret as password.\n\n\n\n## Variables\n\nThis collection includes pre-defined variables. You can set them in two ways:\n\n**Option 1: Collection Variables (Quick Start)**\n1. Click on the collection name\n2. Go to the \"Variables\" tab\n3. Fill in the \"Current value\" column\n\n**Option 2: Environment Variables (Recommended for multiple stores)**\n1. Import `Ecommerce_APIs.postman_environment.json`\n2. Fill in your values\n3. Select the environment in Postman\n\nEnvironment variables override collection variables, so you can use both.\n\n## Endpoints\n\n| Request | Description |\n|---------|-------------|\n| List Products | Get all products (API v3) |\n| List Products (Legacy) | Get all products (API v2) |\n\n## API Documentation\n\nhttps://woocommerce.github.io/woocommerce-rest-api-docs/\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Legacy",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{woo_consumer_secret}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{woo_consumer_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{woo_store_url}}/wc-api/v3/products?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+							"host": [
+								"{{woo_store_url}}"
+							],
+							"path": [
+								"wc-api",
+								"v3",
+								"products"
+							],
+							"query": [
+								{
+									"key": "consumer_key",
+									"value": "{{woo_consumer_key}}"
+								},
+								{
+									"key": "consumer_secret",
+									"value": "{{woo_consumer_secret}}"
+								}
+							]
+						}
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "List Products",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{woo_store_url}}/wp-json/wc/v2/products?consumer_key={{woo_consumer_key}}&consumer_secret={{woo_consumer_secret}}",
+					"host": [
+						"{{woo_store_url}}"
+					],
+					"path": [
+						"wp-json",
+						"wc",
+						"v2",
+						"products"
+					],
+					"query": [
+						{
+							"key": "consumer_key",
+							"value": "{{woo_consumer_key}}"
+						},
+						{
+							"key": "consumer_secret",
+							"value": "{{woo_consumer_secret}}"
+						}
+					]
+				},
+				"description": "https://woocommerce.github.io/woocommerce-rest-api-docs/#products"
+			},
+			"response": [],
+			"description": "GET request - Add description here",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Skip request if required WooCommerce credentials are not configured",
+					"const storeUrl = pm.variables.get('woo_store_url');",
+					"const consumerKey = pm.variables.get('woo_consumer_key');",
+					"const consumerSecret = pm.variables.get('woo_consumer_secret');",
+					"",
+					"const hasStoreUrl = storeUrl && storeUrl.trim() !== '' && !storeUrl.includes('your-store');",
+					"const hasConsumerKey = consumerKey && consumerKey.trim() !== '' && !consumerKey.startsWith('ck_xxxx');",
+					"const hasConsumerSecret = consumerSecret && consumerSecret.trim() !== '' && !consumerSecret.startsWith('cs_xxxx');",
+					"",
+					"if (!hasStoreUrl || !hasConsumerKey || !hasConsumerSecret) {",
+					"    console.log('⏭️ Skipping: WooCommerce credentials not configured');",
+					"    console.log('   Set woo_store_url, woo_consumer_key, and woo_consumer_secret to run this test');",
+					"    pm.execution.skipRequest();",
+					"}",
+					"",
+					"// Set timestamp for request tracking",
+					"pm.environment.set('request_timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Collection-level test script"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "woo_store_url",
+			"value": "",
+			"type": "default",
+			"description": "Full store URL (https://mystore.com)"
+		},
+		{
+			"key": "woo_consumer_key",
+			"value": "",
+			"type": "secret",
+			"description": "REST API consumer key (ck_...)"
+		},
+		{
+			"key": "woo_consumer_secret",
+			"value": "",
+			"type": "secret",
+			"description": "REST API consumer secret (cs_...)"
+		}
+	]
+}

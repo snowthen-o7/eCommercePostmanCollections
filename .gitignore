@@ -1,0 +1,32 @@
+# Local environment files with credentials
+*.local.json
+*_local.json
+.env
+
+# Postman exports with filled credentials  
+*.postman_environment.filled.json
+
+# Test reports
+reports/
+*.html
+
+# Backup files
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node modules (if running tests locally)
+node_modules/

@@ -1,0 +1,1009 @@
+{
+	"info": {
+		"_postman_id": "bigcommerce-api-20251210",
+		"name": "BigCommerce API",
+		"description": "# BigCommerce Catalog API\n\nREST API v3 endpoints for BigCommerce catalog operations.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `bigcommerce_store_hash` | \u2705 | Store hash from API path (e.g., `abc123` from stores/abc123) |\n| `bigcommerce_token` | \u2705 | API access token |\n| `bigcommerce_client_id` | \u2705 | API client ID |\n\n### 2. Get Your API Credentials\n\n1. Go to your BigCommerce Admin \u2192 Settings \u2192 API \u2192 API accounts\n2. Create an API account with appropriate scopes\n3. Copy the Access Token, Client ID, and Store Hash\n\n### 3. Authentication\n\nAll requests use two headers:\n- `X-Auth-Token`: Your API access token\n- `X-Auth-Client`: Your API client ID\n\n## Endpoints\n\n### Store\n- Get Store Information\n\n### Products & Variants\n- List Products\n- Get Product by ID\n- List Product Variants\n- Get Variant by ID\n\n### Categories\n- List Categories\n- Get Category by ID\n\n### Brands\n- List Brands\n- Get Brand by ID\n\n### Customers\n- List Customers\n- Get Customer by ID\n\n### Orders\n- List Orders\n- Get Order by ID\n\n## API Documentation\n\nhttps://developer.bigcommerce.com/docs/rest-catalog\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Store",
+			"item": [
+				{
+					"name": "Get Store Information",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v2/store",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v2", "store"]
+						},
+						"description": "Get store profile and settings"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response has store data', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('id');",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Store information and settings"
+		},
+		{
+			"name": "Products & Variants",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/products?include=variants&limit=10",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "products"],
+							"query": [
+								{"key": "include", "value": "variants"},
+								{"key": "limit", "value": "10"}
+							]
+						},
+						"description": "List all products with variants"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first product and variant IDs for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.length > 0) {",
+									"        const firstProduct = response.data[0];",
+									"        pm.environment.set('bigcommerce_product_id', firstProduct.id);",
+									"        console.log('Extracted product_id:', firstProduct.id);",
+									"        ",
+									"        if (firstProduct.variants && firstProduct.variants.length > 0) {",
+									"            pm.environment.set('bigcommerce_variant_id', firstProduct.variants[0].id);",
+									"            console.log('Extracted variant_id:', firstProduct.variants[0].id);",
+									"        }",
+									"    }",
+									"} catch(e) { console.log('Error extracting IDs:', e); }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/products/{{bigcommerce_product_id}}?include=variants,custom_fields,images",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "products", "{{bigcommerce_product_id}}"],
+							"query": [
+								{"key": "include", "value": "variants,custom_fields,images"}
+							]
+						},
+						"description": "Get a single product with expanded sub-resources"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.variables.get('bigcommerce_product_id');",
+									"if (!productId || productId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Product Variants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/products/{{bigcommerce_product_id}}/variants",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "products", "{{bigcommerce_product_id}}", "variants"]
+						},
+						"description": "Get all variants for a specific product"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.variables.get('bigcommerce_product_id');",
+									"if (!productId || productId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Variant by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/products/{{bigcommerce_product_id}}/variants/{{bigcommerce_variant_id}}",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "products", "{{bigcommerce_product_id}}", "variants", "{{bigcommerce_variant_id}}"]
+						},
+						"description": "Get a specific variant by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.variables.get('bigcommerce_product_id');",
+									"const variantId = pm.variables.get('bigcommerce_variant_id');",
+									"if (!productId || productId.toString().trim() === '' || !variantId || variantId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_product_id or bigcommerce_variant_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Product and variant management"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/categories?limit=50",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "categories"],
+							"query": [
+								{"key": "limit", "value": "50"}
+							]
+						},
+						"description": "List all product categories"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first category ID for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.length > 0) {",
+									"        pm.environment.set('bigcommerce_category_id', response.data[0].id);",
+									"        console.log('Extracted category_id:', response.data[0].id);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/categories/{{bigcommerce_category_id}}",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "categories", "{{bigcommerce_category_id}}"]
+						},
+						"description": "Get a specific category by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const categoryId = pm.variables.get('bigcommerce_category_id');",
+									"if (!categoryId || categoryId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_category_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Category Tree",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/trees",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "trees"]
+						},
+						"description": "Get the category tree structure"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Category management"
+		},
+		{
+			"name": "Brands",
+			"item": [
+				{
+					"name": "List Brands",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/brands?limit=50",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "brands"],
+							"query": [
+								{"key": "limit", "value": "50"}
+							]
+						},
+						"description": "List all product brands"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first brand ID for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.length > 0) {",
+									"        pm.environment.set('bigcommerce_brand_id', response.data[0].id);",
+									"        console.log('Extracted brand_id:', response.data[0].id);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Brand by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/catalog/brands/{{bigcommerce_brand_id}}",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "catalog", "brands", "{{bigcommerce_brand_id}}"]
+						},
+						"description": "Get a specific brand by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const brandId = pm.variables.get('bigcommerce_brand_id');",
+									"if (!brandId || brandId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_brand_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Brand management"
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "List Customers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/customers?limit=10",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "customers"],
+							"query": [
+								{"key": "limit", "value": "10"}
+							]
+						},
+						"description": "List all customers"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Extract first customer ID for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.length > 0) {",
+									"        pm.environment.set('bigcommerce_customer_id', response.data[0].id);",
+									"        console.log('Extracted customer_id:', response.data[0].id);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Customer by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v3/customers?id:in={{bigcommerce_customer_id}}",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v3", "customers"],
+							"query": [
+								{"key": "id:in", "value": "{{bigcommerce_customer_id}}"}
+							]
+						},
+						"description": "Get a specific customer by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const customerId = pm.variables.get('bigcommerce_customer_id');",
+									"if (!customerId || customerId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_customer_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Customer management"
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v2/orders?limit=10",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v2", "orders"],
+							"query": [
+								{"key": "limit", "value": "10"}
+							]
+						},
+						"description": "List all orders"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 or 204', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Extract first order ID for subsequent tests (if orders exist)",
+									"if (pm.response.code === 200) {",
+									"    try {",
+									"        const response = pm.response.json();",
+									"        if (Array.isArray(response) && response.length > 0) {",
+									"            pm.environment.set('bigcommerce_order_id', response[0].id);",
+									"            console.log('Extracted order_id:', response[0].id);",
+									"        }",
+									"    } catch(e) { }",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v2/orders/{{bigcommerce_order_id}}",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v2", "orders", "{{bigcommerce_order_id}}"]
+						},
+						"description": "Get a specific order by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const orderId = pm.variables.get('bigcommerce_order_id');",
+									"if (!orderId || orderId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_order_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Order Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{bigcommerce_token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Client",
+								"value": "{{bigcommerce_client_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.bigcommerce.com/stores/{{bigcommerce_store_hash}}/v2/orders/{{bigcommerce_order_id}}/products",
+							"protocol": "https",
+							"host": ["api", "bigcommerce", "com"],
+							"path": ["stores", "{{bigcommerce_store_hash}}", "v2", "orders", "{{bigcommerce_order_id}}", "products"]
+						},
+						"description": "Get products from a specific order"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const orderId = pm.variables.get('bigcommerce_order_id');",
+									"if (!orderId || orderId.toString().trim() === '') {",
+									"    console.log('Skipping: bigcommerce_order_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Order management"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Skip request if required BigCommerce credentials are not configured",
+					"const storeHash = pm.variables.get('bigcommerce_store_hash');",
+					"const token = pm.variables.get('bigcommerce_token');",
+					"const clientId = pm.variables.get('bigcommerce_client_id');",
+					"",
+					"const hasStoreHash = storeHash && storeHash.trim() !== '' && !storeHash.includes('abc123');",
+					"const hasToken = token && token.trim() !== '' && !token.startsWith('xxxx');",
+					"const hasClientId = clientId && clientId.trim() !== '' && !clientId.startsWith('xxxx');",
+					"",
+					"if (!hasStoreHash || !hasToken || !hasClientId) {",
+					"    console.log('Skipping: BigCommerce credentials not configured');",
+					"    console.log('   Set bigcommerce_store_hash, bigcommerce_token, and bigcommerce_client_id to run this test');",
+					"    pm.execution.skipRequest();",
+					"}",
+					"",
+					"pm.environment.set('request_timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Collection-level test script"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "bigcommerce_store_hash",
+			"value": "",
+			"type": "default",
+			"description": "Store hash from API path"
+		},
+		{
+			"key": "bigcommerce_token",
+			"value": "",
+			"type": "secret",
+			"description": "API access token (X-Auth-Token)"
+		},
+		{
+			"key": "bigcommerce_client_id",
+			"value": "",
+			"type": "secret",
+			"description": "API client ID (X-Auth-Client)"
+		},
+		{
+			"key": "bigcommerce_product_id",
+			"value": "",
+			"type": "default",
+			"description": "Product ID for testing"
+		},
+		{
+			"key": "bigcommerce_variant_id",
+			"value": "",
+			"type": "default",
+			"description": "Variant ID for testing"
+		},
+		{
+			"key": "bigcommerce_category_id",
+			"value": "",
+			"type": "default",
+			"description": "Category ID for testing"
+		},
+		{
+			"key": "bigcommerce_brand_id",
+			"value": "",
+			"type": "default",
+			"description": "Brand ID for testing"
+		},
+		{
+			"key": "bigcommerce_customer_id",
+			"value": "",
+			"type": "default",
+			"description": "Customer ID for testing"
+		},
+		{
+			"key": "bigcommerce_order_id",
+			"value": "",
+			"type": "default",
+			"description": "Order ID for testing"
+		}
+	]
+}

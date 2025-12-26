@@ -1,0 +1,1806 @@
+{
+	"info": {
+		"_postman_id": "shopify-rest-admin-api-20251210",
+		"name": "Shopify REST Admin API",
+		"description": "# Shopify REST Admin API\n\nREST API endpoints for Shopify Admin API operations.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `shopify_store` | \u2705 | Store name (e.g., `my-store` for my-store.myshopify.com) |\n| `shopify_token` | \u2705 | Admin API access token (`shpat_...`) |\n| `shopify_api_version` | \u2705 | API version (default: `2025-01`) |\n\n### 2. Get Your Access Token\n\n1. Go to your Shopify Admin \u2192 Settings \u2192 Apps and sales channels\n2. Click \"Develop apps\" \u2192 Create an app\n3. Configure Admin API scopes\n4. Install the app and copy the Admin API access token\n\n\n\n## Variables\n\nThis collection includes pre-defined variables. You can set them in two ways:\n\n**Option 1: Collection Variables (Quick Start)**\n1. Click on the collection name\n2. Go to the \"Variables\" tab\n3. Fill in the \"Current value\" column\n\n**Option 2: Environment Variables (Recommended for multiple stores)**\n1. Import `Ecommerce_APIs.postman_environment.json`\n2. Fill in your values\n3. Select the environment in Postman\n\nEnvironment variables override collection variables, so you can use both.\n\n## Folders\n\n| Folder | Description |\n|--------|-------------|\n| Products | Product CRUD operations |\n| Variants | Variant management |\n| Inventory | Inventory items and levels |\n| Metafields | Product metafields |\n| Collections | Smart and custom collections |\n| Product Images | Image management |\n\n## Additional Variables\n\n| Variable | Used For |\n|----------|----------|\n| `shopify_product_id` | Product operations |\n| `shopify_variant_id` | Variant operations |\n| `shopify_inventory_item_id` | Inventory queries |\n| `shopify_custom_collection_id` | Custom collection queries |\n| `shopify_smart_collection_id` | Smart collection queries |\n\n## API Documentation\n\nhttps://shopify.dev/docs/api/admin-rest\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Collections",
+			"item": [
+				{
+					"name": "Get a list of all custom collections",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/custom_collections.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2019-10",
+								"custom_collections.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}",
+									"",
+									"// Extract first custom collection ID",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.custom_collections && response.custom_collections.length > 0) {",
+									"        pm.environment.set('shopify_custom_collection_id', response.custom_collections[0].id);",
+									"        console.log('Extracted custom_collection_id:', response.custom_collections[0].id);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a count of all custom collections",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/custom_collections/count.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2019-10",
+								"custom_collections",
+								"count.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a single custom collection",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/custom_collections/{{shopify_custom_collection_id}}.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2019-10",
+								"custom_collections",
+								"{{shopify_custom_collection_id}}.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a list of all smart collections",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/smart_collections.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2019-10",
+								"smart_collections.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}",
+									"",
+									"// Extract first smart_collection_id for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.smart_collections && response.smart_collections.length > 0) {",
+									"        pm.environment.set('shopify_smart_collection_id', response.smart_collections[0].id);",
+									"        console.log('Extracted smart_collection_id:', response.smart_collections[0].id);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a count of all smart collections",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/smart_collections/count.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2019-10",
+								"smart_collections",
+								"count.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a single smart collection",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/smart_collections/{{shopify_smart_collection_id}}.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2019-10",
+								"smart_collections",
+								"{{shopify_smart_collection_id}}.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if smart_collection_id is not set",
+									"const smartCollId = pm.variables.get('shopify_smart_collection_id');",
+									"if (!smartCollId || smartCollId.trim() === '') {",
+									"    console.log('Skipping: shopify_smart_collection_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection\r\nhttps://shopify.dev/docs/admin-api/rest/reference/products/smartcollection",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Metafields",
+			"item": [
+				{
+					"name": "Get all metafields that belong to a store",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/metafields.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"metafields.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get all metafields that belong to a product",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products/{{shopify_product_id}}/metafields.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"products",
+								"{{shopify_product_id}}",
+								"metafields.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if product_id is not set",
+									"const productId = pm.variables.get('shopify_product_id');",
+									"if (!productId || productId.toString().trim() === '') {",
+									"    console.log('Skipping: shopify_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a count of all metafields for a store",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/metafields/count.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"metafields",
+								"count.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a count of all metafields for a product",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products/{{shopify_product_id}}/metafields/count.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"products",
+								"{{shopify_product_id}}",
+								"metafields",
+								"count.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if product_id is not set",
+									"const productId = pm.variables.get('shopify_product_id');",
+									"if (!productId || productId.toString().trim() === '') {",
+									"    console.log('Skipping: shopify_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get a list of all products",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"products.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}",
+									"",
+									"// Extract first product ID for subsequent tests",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.products && response.products.length > 0) {",
+									"        const firstProduct = response.products[0];",
+									"        pm.environment.set('shopify_product_id', firstProduct.id);",
+									"        console.log('Extracted product_id:', firstProduct.id);",
+									"        if (firstProduct.variants && firstProduct.variants.length > 0) {",
+									"            const firstVariant = firstProduct.variants[0];",
+									"            pm.environment.set('shopify_variant_id', firstVariant.id);",
+									"            console.log('Extracted variant_id:', firstVariant.id);",
+									"            if (firstVariant.inventory_item_id) {",
+									"                pm.environment.set('shopify_inventory_item_id', firstVariant.inventory_item_id);",
+									"                console.log('Extracted inventory_item_id:', firstVariant.inventory_item_id);",
+									"            }",
+									"        }",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get all variants for a product",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products/{{shopify_product_id}}/variants.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"products",
+								"{{shopify_product_id}}",
+								"variants.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.variables.get('shopify_product_id');",
+									"if (!productId || String(productId).trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Count all products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products/count.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2025-01",
+								"products",
+								"count.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products"
+					},
+					"response": [],
+					"description": "GET request - Add description here"
+				},
+				{
+					"name": "Get a product variant by id",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products/{{shopify_product_id}}/variants.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"products",
+								"{{shopify_product_id}}",
+								"variants.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a count of variants for a product",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/products/{{shopify_product_id}}/variants/count.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"products",
+								"{{shopify_product_id}}",
+								"variants",
+								"count.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get a product variant by id",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}//variants/{{shopify_variant_id}}.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"",
+								"variants",
+								"{{shopify_variant_id}}.json"
+							]
+						},
+						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "https://shopify.dev/docs/admin-api/rest/reference/products",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Get a list of inventory items",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessToken",
+									"value": "{{shopify_token}}",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "queryParams",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/inventory_items.json?ids={{shopify_inventory_item_id}}",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"2020-01",
+								"inventory_items.json"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "{{shopify_inventory_item_id}}"
+								}
+							]
+						}
+					},
+					"response": [],
+					"description": "GET request - Add description here",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if inventory_item_id is not set",
+									"const invItemId = pm.variables.get('shopify_inventory_item_id');",
+									"if (!invItemId || invItemId.toString().trim() === '') {",
+									"    console.log('Skipping: shopify_inventory_item_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Standard response validation",
+									"pm.test(\"Status code is successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+									"});",
+									"",
+									"// Parse JSON if available",
+									"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+									"    pm.test(\"Response is valid JSON\", function () {",
+									"        pm.response.to.be.json;",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Shop Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"let jsonData = pm.response.json();\r",
+							"\r",
+							"// Extract plan_display_name and plan_name\r",
+							"let planDisplayName = jsonData.shop.plan_display_name;\r",
+							"let planName = jsonData.shop.plan_name;\r",
+							"\r",
+							"// Log them to the Postman Console (visible in Runner logs)\r",
+							"let storeName = pm.iterationData.get(\"store\");\r",
+							"console.info(`Store: ${storeName} | Plan Display Name: ${planDisplayName} | Plan Name: ${planName}`);\r",
+							"\r",
+							"// Fail on non-200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Validate plan fields\r",
+							"pm.test(\"Store Plan Info\", () => {\r",
+							"    pm.expect(planDisplayName).to.not.be.undefined;\r",
+							"    pm.expect(planName).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"// Retry logic\r",
+							"const MAX_RETRIES = 3;\r",
+							"let currentAttempt = pm.environment.get(\"retryCount\") || 0;\r",
+							"\r",
+							"if (pm.response.code !== 200 && currentAttempt < MAX_RETRIES) {\r",
+							"    currentAttempt++;\r",
+							"    pm.environment.set(\"retryCount\", currentAttempt);\r",
+							"    pm.setNextRequest(pm.info.requestName); // retry the same request\r",
+							"} else {\r",
+							"    pm.environment.set(\"retryCount\", 0); // reset after success or max tries\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{shopify_token}}",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "queryParams",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/shop.json",
+					"protocol": "https",
+					"host": [
+						"{{shopify_store}}",
+						"myshopify",
+						"com"
+					],
+					"path": [
+						"admin",
+						"api",
+						"2025-01",
+						"shop.json"
+					]
+				}
+			},
+			"response": [],
+			"description": "GET request - Add description here"
+		},
+		{
+			"name": "REST Shop GET",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Get values of two variables\r",
+							"let store = pm.variables.get(\"store\");\r",
+							"let token = pm.variables.get(\"token\");\r",
+							"let account_id = pm.variables.get(\"account_id\");\r",
+							"\r",
+							"// Parse response JSON\r",
+							"let responseJson = pm.response.json();\r",
+							"\r",
+							"// Extract and map the requested access scopes\r",
+							"let tracked = responseJson?.shop?.country_name;\r",
+							"// let location_name = responseJson?.data?.products?.edges?.[0].node.variants.edges?.[0].node.inventoryItem.inventoryLevels.edges?.[0].node.location.name || responseJson?.errors?.[0].message;\r",
+							"// let fulfillment_name = responseJson?.data?.products?.edges?.[0].node.variants.edges?.[0].node.inventoryItem.inventoryLevels.edges?.[0].node.location.fulfillmentService ?? '';\r",
+							"\r",
+							"// Log variable values\r",
+							"console.info(\r",
+							"    store,\r",
+							"    token,\r",
+							"    tracked,\r",
+							"    //location_name,\r",
+							"    //fulfillment_name\r",
+							");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{shopify_token}}",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "queryParams",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/shop.json",
+					"protocol": "https",
+					"host": [
+						"{{shopify_store}}",
+						"myshopify",
+						"com"
+					],
+					"path": [
+						"admin",
+						"api",
+						"2025-01",
+						"shop.json"
+					]
+				}
+			},
+			"response": [],
+			"description": "GET request - Add description here"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Skip request if required Shopify credentials are not configured",
+					"const store = pm.variables.get('shopify_store');",
+					"const token = pm.variables.get('shopify_token');",
+					"",
+					"const hasStore = store && store.trim() !== '' && !store.includes('your-store');",
+					"const hasToken = token && token.trim() !== '' && !token.startsWith('shpat_xxxx');",
+					"",
+					"if (!hasStore || !hasToken) {",
+					"    console.log('⏭️ Skipping: Shopify credentials not configured');",
+					"    console.log('   Set shopify_store and shopify_token to run this test');",
+					"    pm.execution.skipRequest();",
+					"}",
+					"",
+					"// Set timestamp for request tracking",
+					"pm.environment.set('request_timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Collection-level test script"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "shopify_store",
+			"value": "",
+			"type": "default",
+			"description": "Store name without .myshopify.com"
+		},
+		{
+			"key": "shopify_token",
+			"value": "",
+			"type": "secret",
+			"description": "Admin API access token (shpat_...)"
+		},
+		{
+			"key": "shopify_api_version",
+			"value": "2025-01",
+			"type": "default",
+			"description": "API version (YYYY-MM)"
+		},
+		{
+			"key": "shopify_product_id",
+			"value": "",
+			"type": "default",
+			"description": "Product ID for testing"
+		},
+		{
+			"key": "shopify_variant_id",
+			"value": "",
+			"type": "default",
+			"description": "Variant ID for testing"
+		},
+		{
+			"key": "shopify_inventory_item_id",
+			"value": "",
+			"type": "default",
+			"description": "Inventory item ID"
+		},
+		{
+			"key": "shopify_custom_collection_id",
+			"value": "",
+			"type": "default",
+			"description": "Custom collection ID"
+		},
+		{
+			"key": "shopify_smart_collection_id",
+			"value": "",
+			"type": "default",
+			"description": "Smart collection ID"
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "accessToken",
+				"value": "{{shopify_token}}",
+				"type": "string"
+			},
+			{
+				"key": "headerPrefix",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "queryParams",
+				"type": "string"
+			}
+		]
+	}
+}

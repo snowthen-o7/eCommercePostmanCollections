@@ -1,0 +1,323 @@
+{
+	"info": {
+		"_postman_id": "trustpilot-api-20251210",
+		"name": "TrustPilot API",
+		"description": "# TrustPilot API\n\nAPI endpoints for TrustPilot product reviews integration.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `trustpilot_host` | \u2705 | API host (`https://api.trustpilot.com/`) |\n| `trustpilot_api_key` | \u2705 | Your API key |\n| `trustpilot_api_secret` | \u2705 | Your API secret |\n| `trustpilot_username` | \u2705 | TrustPilot account email |\n| `trustpilot_password` | \u2705 | TrustPilot account password |\n| `trustpilot_business_unit_id` | \u2705 | Your Business Unit ID |\n\n### 2. Get Your API Credentials\n\n1. Log in to TrustPilot Business\n2. Go to Integrations \u2192 API\n3. Create an application to get API key and secret\n4. Find your Business Unit ID in the URL or account settings\n\n### 3. Authentication Flow\n\n1. **First**: Run \"Auth Call\" to get an access token\n   - Uses Basic Auth with API key/secret\n   - Submits username/password in body\n   - Returns an access token\n\n2. **Then**: Use the access token for subsequent requests\n   - The token is stored in `trustpilot_access_token`\n   - Used as Bearer token for API calls\n\n\n\n## Variables\n\nThis collection includes pre-defined variables. You can set them in two ways:\n\n**Option 1: Collection Variables (Quick Start)**\n1. Click on the collection name\n2. Go to the \"Variables\" tab\n3. Fill in the \"Current value\" column\n\n**Option 2: Environment Variables (Recommended for multiple stores)**\n1. Import `Ecommerce_APIs.postman_environment.json`\n2. Fill in your values\n3. Select the environment in Postman\n\nEnvironment variables override collection variables, so you can use both.\n\n## Endpoints\n\n| Request | Description |\n|---------|-------------|\n| Auth Call | Get OAuth access token |\n| UpsertProducts | Create or update products |\n\n## API Documentation\n\nhttps://developers.trustpilot.com/\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth Call",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{trustpilot_api_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{trustpilot_api_key}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{trustpilot_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{trustpilot_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{trustpilot_host}}v1/oauth/oauth-business-users-for-applications/accesstoken",
+					"host": [
+						"{{trustpilot_host}}v1"
+					],
+					"path": [
+						"oauth",
+						"oauth-business-users-for-applications",
+						"accesstoken"
+					]
+				}
+			},
+			"response": [],
+			"description": "POST request - Add description here",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "UpsertProducts",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{trustpilot_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{trustpilot_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{trustpilot_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{trustpilot_host}}v1/private/business-units/{{trustpilot_business_unit_id}}/products",
+					"host": [
+						"{{trustpilot_host}}v1"
+					],
+					"path": [
+						"private",
+						"business-units",
+						"{{trustpilot_business_unit_id}}",
+						"products"
+					]
+				}
+			},
+			"response": [],
+			"description": "POST request - Add description here",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "GetProducts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{trustpilot_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{trustpilot_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{trustpilot_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{trustpilot_host}}v1/private/business-units/{{trustpilot_business_unit_id}}/products",
+					"host": [
+						"{{trustpilot_host}}v1"
+					],
+					"path": [
+						"private",
+						"business-units",
+						"{{trustpilot_business_unit_id}}",
+						"products"
+					]
+				}
+			},
+			"response": [],
+			"description": "GET request - Add description here",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Skip request if required TrustPilot credentials are not configured",
+					"const apiKey = pm.variables.get('trustpilot_api_key');",
+					"const apiSecret = pm.variables.get('trustpilot_api_secret');",
+					"",
+					"const hasApiKey = apiKey && apiKey.trim() !== '' && !apiKey.startsWith('xxxx');",
+					"const hasApiSecret = apiSecret && apiSecret.trim() !== '' && !apiSecret.startsWith('xxxx');",
+					"",
+					"if (!hasApiKey || !hasApiSecret) {",
+					"    console.log('⏭️ Skipping: TrustPilot credentials not configured');",
+					"    console.log('   Set trustpilot_api_key and trustpilot_api_secret to run this test');",
+					"    pm.execution.skipRequest();",
+					"}",
+					"",
+					"// Set timestamp for request tracking",
+					"pm.environment.set('request_timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Collection-level test script"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "trustpilot_host",
+			"value": "https://api.trustpilot.com/",
+			"type": "default",
+			"description": "API base URL"
+		},
+		{
+			"key": "trustpilot_api_key",
+			"value": "",
+			"type": "secret",
+			"description": "API key (Basic Auth username)"
+		},
+		{
+			"key": "trustpilot_api_secret",
+			"value": "",
+			"type": "secret",
+			"description": "API secret (Basic Auth password)"
+		},
+		{
+			"key": "trustpilot_username",
+			"value": "",
+			"type": "default",
+			"description": "TrustPilot account email"
+		},
+		{
+			"key": "trustpilot_password",
+			"value": "",
+			"type": "secret",
+			"description": "TrustPilot account password"
+		},
+		{
+			"key": "trustpilot_business_unit_id",
+			"value": "",
+			"type": "default",
+			"description": "Business Unit ID"
+		},
+		{
+			"key": "trustpilot_access_token",
+			"value": "",
+			"type": "secret",
+			"description": "OAuth token (from Auth Call)"
+		}
+	]
+}

@@ -1,0 +1,258 @@
+{
+	"info": {
+		"_postman_id": "magento-rest-api-20251210",
+		"name": "Magento REST API",
+		"description": "# Magento REST API\n\nREST API endpoints for Magento 2 stores.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `magento_store_url` | \u2705 | Full store URL (e.g., `https://mystore.com`) |\n| `magento_token` | \u2705* | Integration access token (for Bearer auth) |\n\n*Or use OAuth 1.0 credentials (see below)\n\n### 2. Get Your Access Token\n\n**Option A: Integration Token (Recommended)**\n1. Go to System \u2192 Integrations\n2. Create a new integration with API access\n3. Activate and copy the Access Token\n\n**Option B: OAuth 1.0**\nSet these additional variables:\n- `magento_consumer_key`\n- `magento_consumer_secret`\n- `magento_access_token`\n- `magento_token_secret`\n\n### 3. Authentication\n\nUses Bearer token authentication by default:\n```\nAuthorization: Bearer {{magento_token}}\n```\n\n\n\n## Variables\n\nThis collection includes pre-defined variables. You can set them in two ways:\n\n**Option 1: Collection Variables (Quick Start)**\n1. Click on the collection name\n2. Go to the \"Variables\" tab\n3. Fill in the \"Current value\" column\n\n**Option 2: Environment Variables (Recommended for multiple stores)**\n1. Import `Ecommerce_APIs.postman_environment.json`\n2. Fill in your values\n3. Select the environment in Postman\n\nEnvironment variables override collection variables, so you can use both.\n\n## Endpoints\n\n| Request | Description |\n|---------|-------------|\n| List Products | Get all products from catalog |\n| Get Store Configuration | Get store settings |\n\n## API Documentation\n\nhttps://developer.adobe.com/commerce/webapi/rest/\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Products",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{magento_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{magento_store_url}}rest/V1/products?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+					"host": [
+						"{{magento_store_url}}rest"
+					],
+					"path": [
+						"V1",
+						"products"
+					],
+					"query": [
+						{
+							"key": "searchCriteria[currentPage]",
+							"value": "1"
+						},
+						{
+							"key": "searchCriteria[pageSize]",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [],
+			"description": "GET request - Add description here",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Products (OAuth 1)",
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA256",
+							"type": "string"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "6jroqjrmo5ktle239o4fz6s7tyhcpvg6 ",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "e5j8p665stytxb2cuocevlrokw0xlkup",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "mgm20wlia4hs4ykj8h8kuc4zhbz8ioqm",
+							"type": "string"
+						},
+						{
+							"key": "consumerKey",
+							"value": "sgfu9zu90a5tdyc0r2d6cd2jpkinoq5p",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "1.0",
+							"type": "string"
+						},
+						{
+							"key": "addParamsToHeader",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{magento_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{magento_store_url}}rest/V1/store/storeGroups?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+					"host": [
+						"{{magento_store_url}}rest"
+					],
+					"path": [
+						"V1",
+						"store",
+						"storeGroups"
+					],
+					"query": [
+						{
+							"key": "searchCriteria[currentPage]",
+							"value": "1"
+						},
+						{
+							"key": "searchCriteria[pageSize]",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [],
+			"description": "GET request - Add description here",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Standard response validation",
+							"pm.test(\"Status code is successful\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+							"});",
+							"",
+							"// Parse JSON if available",
+							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
+							"    pm.test(\"Response is valid JSON\", function () {",
+							"        pm.response.to.be.json;",
+							"    });",
+							"}"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Skip request if required Magento credentials are not configured",
+					"const storeUrl = pm.variables.get('magento_store_url');",
+					"const token = pm.variables.get('magento_token');",
+					"",
+					"const hasStoreUrl = storeUrl && storeUrl.trim() !== '' && !storeUrl.includes('your-store');",
+					"const hasToken = token && token.trim() !== '' && !token.startsWith('xxxx');",
+					"",
+					"if (!hasStoreUrl || !hasToken) {",
+					"    console.log('⏭️ Skipping: Magento credentials not configured');",
+					"    console.log('   Set magento_store_url and magento_token to run this test');",
+					"    pm.execution.skipRequest();",
+					"}",
+					"",
+					"// Set timestamp for request tracking",
+					"pm.environment.set('request_timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Collection-level test script"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "magento_store_url",
+			"value": "",
+			"type": "default",
+			"description": "Full store URL (https://mystore.com)"
+		},
+		{
+			"key": "magento_token",
+			"value": "",
+			"type": "secret",
+			"description": "Integration access token (Bearer auth)"
+		},
+		{
+			"key": "magento_consumer_key",
+			"value": "",
+			"type": "secret",
+			"description": "OAuth 1.0 consumer key (optional)"
+		},
+		{
+			"key": "magento_consumer_secret",
+			"value": "",
+			"type": "secret",
+			"description": "OAuth 1.0 consumer secret (optional)"
+		},
+		{
+			"key": "magento_access_token",
+			"value": "",
+			"type": "secret",
+			"description": "OAuth 1.0 access token (optional)"
+		},
+		{
+			"key": "magento_token_secret",
+			"value": "",
+			"type": "secret",
+			"description": "OAuth 1.0 token secret (optional)"
+		}
+	]
+}

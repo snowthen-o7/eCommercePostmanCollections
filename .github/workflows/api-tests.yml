@@ -1,0 +1,288 @@
+# .github/workflows/api-tests.yml
+# Automated API testing with Newman
+#
+# Runs on:
+#   - Push to main/master
+#   - Pull requests
+#   - Manual trigger (workflow_dispatch)
+#   - Scheduled (daily at midnight UTC)
+#
+# Required Secrets (set in GitHub repo settings):
+#   SHOPIFY_STORE, SHOPIFY_TOKEN
+#   BIGCOMMERCE_STORE_HASH, BIGCOMMERCE_TOKEN, BIGCOMMERCE_CLIENT_ID
+#   WOO_STORE_URL, WOO_CONSUMER_KEY, WOO_CONSUMER_SECRET
+#   MAGENTO_STORE_URL, MAGENTO_TOKEN
+#   TRUSTPILOT_API_KEY, TRUSTPILOT_API_SECRET, TRUSTPILOT_USERNAME, TRUSTPILOT_PASSWORD, TRUSTPILOT_BUSINESS_UNIT_ID
+
+name: API Collection Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      collection:
+        description: 'Collection to test'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - shopify-graphql
+          - shopify-rest
+          - bigcommerce
+          - woocommerce
+          - magento
+          - trustpilot
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+
+jobs:
+  test-shopify-graphql:
+    name: Shopify GraphQL
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.collection == 'all' || 
+      github.event.inputs.collection == 'shopify-graphql'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+      
+      - name: Run Shopify GraphQL Tests
+        if: env.SHOPIFY_TOKEN != ''
+        env:
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        run: |
+          newman run Shopify_GraphQL_API.postman_collection.json \
+            --env-var "shopify_store=$SHOPIFY_STORE" \
+            --env-var "shopify_token=$SHOPIFY_TOKEN" \
+            --env-var "shopify_api_version=2025-01" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/shopify-graphql-report.html
+      
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shopify-graphql-report
+          path: reports/
+          retention-days: 30
+
+  test-shopify-rest:
+    name: Shopify REST
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.collection == 'all' || 
+      github.event.inputs.collection == 'shopify-rest'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+      
+      - name: Run Shopify REST Tests
+        if: env.SHOPIFY_TOKEN != ''
+        env:
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        run: |
+          newman run Shopify_REST_API.postman_collection.json \
+            --env-var "shopify_store=$SHOPIFY_STORE" \
+            --env-var "shopify_token=$SHOPIFY_TOKEN" \
+            --env-var "shopify_api_version=2025-01" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/shopify-rest-report.html
+      
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shopify-rest-report
+          path: reports/
+          retention-days: 30
+
+  test-bigcommerce:
+    name: BigCommerce
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.collection == 'all' || 
+      github.event.inputs.collection == 'bigcommerce'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+      
+      - name: Run BigCommerce Tests
+        if: env.BIGCOMMERCE_TOKEN != ''
+        env:
+          BIGCOMMERCE_STORE_HASH: ${{ secrets.BIGCOMMERCE_STORE_HASH }}
+          BIGCOMMERCE_TOKEN: ${{ secrets.BIGCOMMERCE_TOKEN }}
+          BIGCOMMERCE_CLIENT_ID: ${{ secrets.BIGCOMMERCE_CLIENT_ID }}
+        run: |
+          newman run BigCommerce_API.postman_collection.json \
+            --env-var "bigcommerce_store_hash=$BIGCOMMERCE_STORE_HASH" \
+            --env-var "bigcommerce_token=$BIGCOMMERCE_TOKEN" \
+            --env-var "bigcommerce_client_id=$BIGCOMMERCE_CLIENT_ID" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/bigcommerce-report.html
+      
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bigcommerce-report
+          path: reports/
+          retention-days: 30
+
+  test-woocommerce:
+    name: WooCommerce
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.collection == 'all' || 
+      github.event.inputs.collection == 'woocommerce'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+      
+      - name: Run WooCommerce Tests
+        if: env.WOO_CONSUMER_KEY != ''
+        env:
+          WOO_STORE_URL: ${{ secrets.WOO_STORE_URL }}
+          WOO_CONSUMER_KEY: ${{ secrets.WOO_CONSUMER_KEY }}
+          WOO_CONSUMER_SECRET: ${{ secrets.WOO_CONSUMER_SECRET }}
+        run: |
+          newman run WooCommerce_API.postman_collection.json \
+            --env-var "woo_store_url=$WOO_STORE_URL" \
+            --env-var "woo_consumer_key=$WOO_CONSUMER_KEY" \
+            --env-var "woo_consumer_secret=$WOO_CONSUMER_SECRET" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/woocommerce-report.html
+      
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: woocommerce-report
+          path: reports/
+          retention-days: 30
+
+  test-magento:
+    name: Magento
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.collection == 'all' || 
+      github.event.inputs.collection == 'magento'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+      
+      - name: Run Magento Tests
+        if: env.MAGENTO_TOKEN != ''
+        env:
+          MAGENTO_STORE_URL: ${{ secrets.MAGENTO_STORE_URL }}
+          MAGENTO_TOKEN: ${{ secrets.MAGENTO_TOKEN }}
+        run: |
+          newman run Magento_API.postman_collection.json \
+            --env-var "magento_store_url=$MAGENTO_STORE_URL" \
+            --env-var "magento_token=$MAGENTO_TOKEN" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/magento-report.html
+      
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: magento-report
+          path: reports/
+          retention-days: 30
+
+  test-trustpilot:
+    name: TrustPilot
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.collection == 'all' || 
+      github.event.inputs.collection == 'trustpilot'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+      
+      - name: Run TrustPilot Tests
+        if: env.TRUSTPILOT_API_KEY != ''
+        env:
+          TRUSTPILOT_API_KEY: ${{ secrets.TRUSTPILOT_API_KEY }}
+          TRUSTPILOT_API_SECRET: ${{ secrets.TRUSTPILOT_API_SECRET }}
+          TRUSTPILOT_USERNAME: ${{ secrets.TRUSTPILOT_USERNAME }}
+          TRUSTPILOT_PASSWORD: ${{ secrets.TRUSTPILOT_PASSWORD }}
+          TRUSTPILOT_BUSINESS_UNIT_ID: ${{ secrets.TRUSTPILOT_BUSINESS_UNIT_ID }}
+        run: |
+          newman run TrustPilot_API.postman_collection.json \
+            --env-var "trustpilot_api_key=$TRUSTPILOT_API_KEY" \
+            --env-var "trustpilot_api_secret=$TRUSTPILOT_API_SECRET" \
+            --env-var "trustpilot_username=$TRUSTPILOT_USERNAME" \
+            --env-var "trustpilot_password=$TRUSTPILOT_PASSWORD" \
+            --env-var "trustpilot_business_unit_id=$TRUSTPILOT_BUSINESS_UNIT_ID" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/trustpilot-report.html
+      
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trustpilot-report
+          path: reports/
+          retention-days: 30

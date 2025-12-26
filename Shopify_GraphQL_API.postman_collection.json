@@ -1,0 +1,2686 @@
+{
+	"info": {
+		"_postman_id": "shopify-graphql-admin-api-20251210",
+		"name": "Shopify GraphQL Admin API",
+		"description": "# Shopify GraphQL Admin API\n\nComprehensive GraphQL collection for Shopify's Admin API with full query/mutation support.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `shopify_store` | \u2705 | Store name (e.g., `my-store` for my-store.myshopify.com) |\n| `shopify_token` | \u2705 | Admin API access token (`shpat_...`) |\n| `shopify_api_version` | \u2705 | API version (default: `2025-01`) |\n\n### 2. Get Your Access Token\n\n1. Go to your Shopify Admin \u2192 Settings \u2192 Apps and sales channels\n2. Click \"Develop apps\" \u2192 Create an app\n3. Configure Admin API scopes (read/write products, inventory, orders, etc.)\n4. Install the app and copy the Admin API access token\n\n### 3. Make Requests\n\nAll requests use the `X-Shopify-Access-Token` header automatically.\n\n\n\n## Variables\n\nThis collection includes pre-defined variables. You can set them in two ways:\n\n**Option 1: Collection Variables (Quick Start)**\n1. Click on the collection name\n2. Go to the \"Variables\" tab\n3. Fill in the \"Current value\" column\n\n**Option 2: Environment Variables (Recommended for multiple stores)**\n1. Import `Ecommerce_APIs.postman_environment.json`\n2. Fill in your values\n3. Select the environment in Postman\n\nEnvironment variables override collection variables, so you can use both.\n\n## Folders\n\n| Folder | Description |\n|--------|-------------|\n| Shop & App | Shop info, access scopes, publications, locations |\n| Products | Product CRUD, search, metafields |\n| Variants | Variant queries |\n| Inventory | Items, levels, quantity adjustments |\n| Collections | List and products |\n| Orders | Order queries |\n| Customers | Customer queries |\n| Metafields | Set and delete metafields |\n| Bulk Operations | Async bulk data exports |\n| Webhooks | Subscription management |\n\n## Additional Variables\n\nSet these as needed for specific requests:\n\n| Variable | Used For |\n|----------|----------|\n| `shopify_product_id` | Product queries (numeric ID) |\n| `shopify_variant_id` | Variant queries |\n| `shopify_location_id` | Inventory operations |\n| `shopify_inventory_item_id` | Inventory adjustments |\n| `shopify_collection_id` | Collection queries |\n| `shopify_order_id` | Order queries |\n| `shopify_bulk_operation_id` | Polling bulk operations |\n| `shopify_webhook_callback_url` | Creating webhooks |\n\n## API Documentation\n\nhttps://shopify.dev/docs/api/admin-graphql\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Shop & App",
+			"description": "Shop information and app installation details",
+			"item": [
+				{
+					"name": "Get Shop Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetShopInfo {\n  shop {\n    id\n    name\n    email\n    url\n    myshopifyDomain\n    primaryDomain {\n      url\n      host\n    }\n    plan {\n      displayName\n      partnerDevelopment\n      shopifyPlus\n    }\n    currencyCode\n    weightUnit\n    billingAddress {\n      country\n      countryCodeV2\n      province\n      city\n    }\n    timezoneAbbreviation\n    ianaTimezone\n    createdAt\n    updatedAt\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Retrieves basic shop information including plan, currency, and location details."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract shop_id for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.shop?.id) {",
+									"    const shopId = response.data.shop.id.split('/').pop();",
+									"    pm.environment.set('shopify_shop_id', shopId);",
+									"    console.log('Extracted shop_id:', shopId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Access Scopes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetAccessScopes {\n  currentAppInstallation {\n    id\n    accessScopes {\n      handle\n      description\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists all access scopes granted to the current app installation. Useful for debugging permission issues."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Publications (Sales Channels)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetPublications {\n  publications(first: 20) {\n    edges {\n      node {\n        id\n        name\n        supportsFuturePublishing\n        catalog {\n          id\n          title\n        }\n      }\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists all publications (sales channels) where products can be published."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors (or permission denied)', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        // Accept ACCESS_DENIED as valid (requires read_publications scope)",
+									"        const isPermissionError = response.errors.every(e => e.extensions?.code === 'ACCESS_DENIED');",
+									"        if (isPermissionError) {",
+									"            console.log('Note: Requires read_publications scope');",
+									"        } else {",
+									"            console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"            pm.expect.fail('Unexpected GraphQL error');",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Locations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetLocations {\n  locations(first: 50) {\n    edges {\n      node {\n        id\n        legacyResourceId\n        name\n        isActive\n        fulfillsOnlineOrders\n        address {\n          address1\n          city\n          province\n          country\n          zip\n        }\n      }\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists all inventory locations for the shop."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract first location ID for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.locations?.edges?.length > 0) {",
+									"    const firstLocation = response.data.locations.edges[0].node;",
+									"    pm.environment.set('shopify_location_id', firstLocation.legacyResourceId || firstLocation.id);",
+									"    console.log('Extracted location_id:', firstLocation.legacyResourceId || firstLocation.id);",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"description": "Product queries and mutations",
+			"item": [
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetProduct($id: ID!) {\n  product(id: $id) {\n    id\n    legacyResourceId\n    title\n    handle\n    descriptionHtml\n    vendor\n    productType\n    status\n    tags\n    createdAt\n    updatedAt\n    publishedAt\n    onlineStoreUrl\n    totalInventory\n    tracksInventory\n    options {\n      id\n      name\n      position\n      values\n    }\n    images(first: 10) {\n      edges {\n        node {\n          id\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n    variants(first: 100) {\n      edges {\n        node {\n          id\n          legacyResourceId\n          title\n          sku\n          barcode\n          price\n          compareAtPrice\n          availableForSale\n          inventoryQuantity\n          selectedOptions {\n            name\n            value\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/Product/{{shopify_product_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Retrieves a single product with full details including variants, images, and options."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if product_id is not available",
+									"const productId = pm.variables.get('shopify_product_id');",
+									"if (!productId || productId.trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_product_id not set (run List Products first)');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract variant and inventory IDs for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.product?.variants?.edges?.length > 0) {",
+									"    const firstVariant = response.data.product.variants.edges[0].node;",
+									"    const variantId = firstVariant.legacyResourceId || firstVariant.id.split('/').pop();",
+									"    pm.environment.set('shopify_variant_id', variantId);",
+									"    console.log('Extracted variant_id:', variantId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Products",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ListProducts($first: Int!, $after: String, $query: String) {\n  products(first: $first, after: $after, query: $query) {\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n    edges {\n      cursor\n      node {\n        id\n        legacyResourceId\n        title\n        handle\n        status\n        vendor\n        productType\n        totalInventory\n        createdAt\n        updatedAt\n        variantsCount {\n          count\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"first\": 50,\n  \"after\": null,\n  \"query\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists products with pagination. Use 'query' variable for filtering (e.g., \"status:active\", \"vendor:Nike\")."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract first product ID for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.products?.edges?.length > 0) {",
+									"    const firstProduct = response.data.products.edges[0].node;",
+									"    const productId = firstProduct.legacyResourceId || firstProduct.id.split('/').pop();",
+									"    pm.environment.set('shopify_product_id', productId);",
+									"    console.log('Extracted product_id:', productId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Products Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetProductsCount {\n  productsCount {\n    count\n    precision\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Gets the total count of products in the store."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query SearchProducts($query: String!) {\n  products(first: 25, query: $query) {\n    edges {\n      node {\n        id\n        title\n        handle\n        status\n        vendor\n        totalInventory\n        variants(first: 5) {\n          edges {\n            node {\n              sku\n              price\n              inventoryQuantity\n            }\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"query\": \"status:active AND inventory_total:>0\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Search products using query syntax. Examples: \"status:active\", \"vendor:Nike\", \"title:*shirt*\""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Product with Publications",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetProductPublications($id: ID!) {\n  product(id: $id) {\n    id\n    title\n    status\n    resourcePublicationsV2(first: 20) {\n      edges {\n        node {\n          isPublished\n          publishDate\n          publication {\n            id\n            name\n            catalog {\n              id\n              title\n            }\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/Product/{{shopify_product_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Gets a product with its publication status across all sales channels."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.variables.get('shopify_product_id');",
+									"if (!productId || productId.trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors (or permission denied)', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        // Accept ACCESS_DENIED as valid (requires read_publications scope)",
+									"        const isPermissionError = response.errors.every(e => e.extensions?.code === 'ACCESS_DENIED');",
+									"        if (isPermissionError) {",
+									"            console.log('Note: Requires read_publications scope');",
+									"        } else {",
+									"            console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"            pm.expect.fail('Unexpected GraphQL error');",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Product Metafields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetProductMetafields($id: ID!) {\n  product(id: $id) {\n    id\n    title\n    metafields(first: 50) {\n      edges {\n        node {\n          id\n          namespace\n          key\n          value\n          type\n          createdAt\n          updatedAt\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/Product/{{shopify_product_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Gets all metafields for a product."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const productId = pm.variables.get('shopify_product_id');",
+									"if (!productId || productId.trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_product_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Variants",
+			"description": "Product variant queries",
+			"item": [
+				{
+					"name": "Get Variant by ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetVariant($id: ID!) {\n  productVariant(id: $id) {\n    id\n    legacyResourceId\n    title\n    displayName\n    sku\n    barcode\n    price\n    compareAtPrice\n    availableForSale\n    inventoryQuantity\n    inventoryPolicy\n    taxable\n    taxCode\n    weight\n    weightUnit\n    createdAt\n    updatedAt\n    selectedOptions {\n      name\n      value\n    }\n    image {\n      url\n      altText\n    }\n    product {\n      id\n      title\n    }\n    inventoryItem {\n      id\n      tracked\n      sku\n      requiresShipping\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/ProductVariant/{{shopify_variant_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Retrieves detailed information about a single product variant."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const variantId = pm.variables.get('shopify_variant_id');",
+									"if (!variantId || variantId.trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_variant_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"// Extract inventory_item_id for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.productVariant?.inventoryItem?.id) {",
+									"    const invItemId = response.data.productVariant.inventoryItem.id.split('/').pop();",
+									"    pm.environment.set('shopify_inventory_item_id', invItemId);",
+									"    console.log('Extracted inventory_item_id:', invItemId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Product Variants",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ListProductVariants($productId: ID!, $first: Int!, $after: String) {\n  product(id: $productId) {\n    id\n    title\n    variants(first: $first, after: $after) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      edges {\n        node {\n          id\n          legacyResourceId\n          title\n          sku\n          barcode\n          price\n          compareAtPrice\n          inventoryQuantity\n          availableForSale\n          selectedOptions {\n            name\n            value\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"productId\": \"gid://shopify/Product/{{shopify_product_id}}\",\n  \"first\": 100,\n  \"after\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists all variants for a specific product with pagination."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"description": "Inventory items and levels",
+			"item": [
+				{
+					"name": "Get Inventory Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetInventoryItem($id: ID!) {\n  inventoryItem(id: $id) {\n    id\n    legacyResourceId\n    sku\n    tracked\n    requiresShipping\n    createdAt\n    updatedAt\n    unitCost {\n      amount\n      currencyCode\n    }\n    inventoryLevels(first: 50) {\n      edges {\n        node {\n          id\n          quantities(names: [\"available\", \"incoming\", \"committed\", \"on_hand\"]) {\n            name\n            quantity\n          }\n          location {\n            id\n            name\n          }\n        }\n      }\n    }\n    variant {\n      id\n      title\n      product {\n        id\n        title\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/InventoryItem/{{shopify_inventory_item_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Retrieves inventory item details including levels at all locations."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if inventory_item_id is not set",
+									"const invItemId = pm.variables.get('shopify_inventory_item_id');",
+									"if (!invItemId || invItemId.trim() === '') {",
+									"    console.log('Skipping: shopify_inventory_item_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Inventory Levels at Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetInventoryLevels($locationId: ID!, $first: Int!, $after: String) {\n  location(id: $locationId) {\n    id\n    name\n    inventoryLevels(first: $first, after: $after) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      edges {\n        node {\n          id\n          quantities(names: [\"available\", \"on_hand\"]) {\n            name\n            quantity\n          }\n          item {\n            id\n            sku\n            variant {\n              id\n              title\n              product {\n                id\n                title\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"locationId\": \"gid://shopify/Location/{{shopify_location_id}}\",\n  \"first\": 50,\n  \"after\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists inventory levels for all items at a specific location."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if location_id is not set",
+									"const locationId = pm.variables.get('shopify_location_id');",
+									"if (!locationId || locationId.trim() === '') {",
+									"    console.log('Skipping: shopify_location_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Adjust Inventory Quantities",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation AdjustInventory($input: InventoryAdjustQuantitiesInput!) {\n  inventoryAdjustQuantities(input: $input) {\n    inventoryAdjustmentGroup {\n      createdAt\n      reason\n      changes {\n        name\n        delta\n      }\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"reason\": \"correction\",\n    \"name\": \"available\",\n    \"changes\": [\n      {\n        \"inventoryItemId\": \"gid://shopify/InventoryItem/{{shopify_inventory_item_id}}\",\n        \"locationId\": \"gid://shopify/Location/{{shopify_location_id}}\",\n        \"delta\": 10\n      }\n    ]\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Adjusts inventory by delta (positive or negative). Reasons: correction, cycle_count_available, damaged, received, restock, shrinkage, etc."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if inventory_item_id or location_id is not set",
+									"const invItemId = pm.variables.get('shopify_inventory_item_id');",
+									"const locationId = pm.variables.get('shopify_location_id');",
+									"if (!invItemId || invItemId.trim() === '' || !locationId || locationId.trim() === '') {",
+									"    console.log('Skipping: shopify_inventory_item_id or shopify_location_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Set Inventory Quantities",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SetInventory($input: InventorySetQuantitiesInput!) {\n  inventorySetQuantities(input: $input) {\n    inventoryAdjustmentGroup {\n      createdAt\n      reason\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"reason\": \"correction\",\n    \"name\": \"available\",\n    \"ignoreCompareQuantity\": true,\n    \"quantities\": [\n      {\n        \"inventoryItemId\": \"gid://shopify/InventoryItem/{{shopify_inventory_item_id}}\",\n        \"locationId\": \"gid://shopify/Location/{{shopify_location_id}}\",\n        \"quantity\": 100\n      }\n    ]\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Sets inventory to an absolute quantity."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if inventory_item_id or location_id is not set",
+									"const invItemId = pm.variables.get('shopify_inventory_item_id');",
+									"const locationId = pm.variables.get('shopify_location_id');",
+									"if (!invItemId || invItemId.trim() === '' || !locationId || locationId.trim() === '') {",
+									"    console.log('Skipping: shopify_inventory_item_id or shopify_location_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Collections",
+			"description": "Product collection queries",
+			"item": [
+				{
+					"name": "List Collections",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ListCollections($first: Int!, $after: String) {\n  collections(first: $first, after: $after) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        id\n        legacyResourceId\n        title\n        handle\n        description\n        productsCount {\n          count\n        }\n        sortOrder\n        updatedAt\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"first\": 50,\n  \"after\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists all collections with pagination."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract first collection ID for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.collections?.edges?.length > 0) {",
+									"    const firstCollection = response.data.collections.edges[0].node;",
+									"    const collectionId = firstCollection.legacyResourceId || firstCollection.id.split('/').pop();",
+									"    pm.environment.set('shopify_collection_id', collectionId);",
+									"    console.log('Extracted collection_id:', collectionId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Collection Products",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetCollectionProducts($id: ID!, $first: Int!, $after: String) {\n  collection(id: $id) {\n    id\n    title\n    handle\n    products(first: $first, after: $after) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      edges {\n        node {\n          id\n          title\n          handle\n          status\n          totalInventory\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/Collection/{{shopify_collection_id}}\",\n  \"first\": 50,\n  \"after\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Gets all products in a specific collection."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const collectionId = pm.variables.get('shopify_collection_id');",
+									"if (!collectionId || collectionId.trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_collection_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"description": "Order queries",
+			"item": [
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ListOrders($first: Int!, $after: String, $query: String) {\n  orders(first: $first, after: $after, query: $query) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        id\n        legacyResourceId\n        name\n        email\n        createdAt\n        displayFinancialStatus\n        displayFulfillmentStatus\n        totalPriceSet {\n          shopMoney {\n            amount\n            currencyCode\n          }\n        }\n        customer {\n          id\n          email\n          firstName\n          lastName\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"first\": 50,\n  \"after\": null,\n  \"query\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists orders with pagination. Query examples: \"fulfillment_status:unfulfilled\", \"financial_status:paid\""
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract first order ID for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.orders?.edges?.length > 0) {",
+									"    const firstOrder = response.data.orders.edges[0].node;",
+									"    const orderId = firstOrder.legacyResourceId || firstOrder.id.split('/').pop();",
+									"    pm.environment.set('shopify_order_id', orderId);",
+									"    console.log('Extracted order_id:', orderId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetOrder($id: ID!) {\n  order(id: $id) {\n    id\n    legacyResourceId\n    name\n    email\n    phone\n    createdAt\n    displayFinancialStatus\n    displayFulfillmentStatus\n    cancelledAt\n    note\n    tags\n    totalPriceSet {\n      shopMoney {\n        amount\n        currencyCode\n      }\n    }\n    customer {\n      id\n      email\n      firstName\n      lastName\n    }\n    shippingAddress {\n      name\n      address1\n      address2\n      city\n      province\n      country\n      zip\n    }\n    lineItems(first: 100) {\n      edges {\n        node {\n          id\n          title\n          quantity\n          sku\n          variant {\n            id\n            title\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/Order/{{shopify_order_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Retrieves full order details including line items."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const orderId = pm.variables.get('shopify_order_id');",
+									"if (!orderId || orderId.trim() === '') {",
+									"    console.log('⏭️ Skipping: shopify_order_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"description": "Customer queries",
+			"item": [
+				{
+					"name": "List Customers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ListCustomers($first: Int!, $after: String, $query: String) {\n  customers(first: $first, after: $after, query: $query) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        id\n        legacyResourceId\n        email\n        firstName\n        lastName\n        phone\n        createdAt\n        numberOfOrders\n        amountSpent {\n          amount\n          currencyCode\n        }\n        tags\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"first\": 50,\n  \"after\": null,\n  \"query\": null\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists customers with pagination."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract first customer ID for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.customers?.edges?.length > 0) {",
+									"    const firstCustomer = response.data.customers.edges[0].node;",
+									"    const customerId = firstCustomer.legacyResourceId || firstCustomer.id.split('/').pop();",
+									"    pm.environment.set('shopify_customer_id', customerId);",
+									"    console.log('Extracted customer_id:', customerId);",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Metafields",
+			"description": "Metafield queries and mutations",
+			"item": [
+				{
+					"name": "Set Metafields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SetMetafields($metafields: [MetafieldsSetInput!]!) {\n  metafieldsSet(metafields: $metafields) {\n    metafields {\n      id\n      namespace\n      key\n      value\n      type\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"metafields\": [\n    {\n      \"ownerId\": \"gid://shopify/Product/{{shopify_product_id}}\",\n      \"namespace\": \"custom\",\n      \"key\": \"my_field\",\n      \"value\": \"my value\",\n      \"type\": \"single_line_text_field\"\n    }\n  ]\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Creates or updates metafields. Types: single_line_text_field, multi_line_text_field, number_integer, number_decimal, boolean, json, date, url, color, etc."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Metafield",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteMetafields($metafields: [MetafieldIdentifierInput!]!) {\n  metafieldsDelete(metafields: $metafields) {\n    deletedMetafields {\n      ownerId\n      namespace\n      key\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"metafields\": [\n    {\n      \"ownerId\": \"gid://shopify/Shop/{{shopify_shop_id}}\",\n      \"namespace\": \"test\",\n      \"key\": \"example\"\n    }\n  ]\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Deletes a metafield by ID."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if shop_id is not set",
+									"const shopId = pm.variables.get('shopify_shop_id');",
+									"if (!shopId || shopId.trim() === '') {",
+									"    console.log('Skipping: shopify_shop_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Bulk Operations",
+			"description": "Async bulk queries for large data exports",
+			"item": [
+				{
+					"name": "Run Bulk Products Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RunBulkProductsQuery {\n  bulkOperationRunQuery(\n    query: \"\"\"\n    {\n      products {\n        edges {\n          node {\n            id\n            legacyResourceId\n            title\n            handle\n            vendor\n            productType\n            status\n            createdAt\n            updatedAt\n            tags\n            variants {\n              edges {\n                node {\n                  id\n                  legacyResourceId\n                  sku\n                  barcode\n                  price\n                  compareAtPrice\n                  inventoryQuantity\n                  inventoryItem {\n                    id\n                    tracked\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n    \"\"\"\n  ) {\n    bulkOperation {\n      id\n      status\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Starts bulk export of all products. Save the returned ID to poll for completion."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Current Bulk Operation Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetCurrentBulkOperation {\n  currentBulkOperation(type: QUERY) {\n    id\n    status\n    errorCode\n    createdAt\n    completedAt\n    objectCount\n    fileSize\n    url\n    partialDataUrl\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Poll this until status is COMPLETED, then download from the url field."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Bulk Operation by ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetBulkOperation($id: ID!) {\n  node(id: $id) {\n    ... on BulkOperation {\n      id\n      status\n      errorCode\n      createdAt\n      completedAt\n      objectCount\n      fileSize\n      url\n      partialDataUrl\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"{{shopify_bulk_operation_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Gets status of a specific bulk operation by GID."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if bulk_operation_id is not set",
+									"const bulkOpId = pm.variables.get('shopify_bulk_operation_id');",
+									"if (!bulkOpId || bulkOpId.trim() === '') {",
+									"    console.log('Skipping: shopify_bulk_operation_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Cancel Bulk Operation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CancelBulkOperation($id: ID!) {\n  bulkOperationCancel(id: $id) {\n    bulkOperation {\n      id\n      status\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"{{shopify_bulk_operation_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Cancels a running bulk operation."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if bulk_operation_id is not set",
+									"const bulkOpId = pm.variables.get('shopify_bulk_operation_id');",
+									"if (!bulkOpId || bulkOpId.trim() === '') {",
+									"    console.log('Skipping: shopify_bulk_operation_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"description": "Webhook subscription management",
+			"item": [
+				{
+					"name": "List Webhook Subscriptions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ListWebhooks($first: Int!) {\n  webhookSubscriptions(first: $first) {\n    edges {\n      node {\n        id\n        topic\n        format\n        createdAt\n        endpoint {\n          __typename\n          ... on WebhookHttpEndpoint {\n            callbackUrl\n          }\n        }\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"first\": 50\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Lists all webhook subscriptions."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});",
+									"",
+									"// Extract first webhook ID for subsequent tests",
+									"const response = pm.response.json();",
+									"if (response.data?.webhookSubscriptions?.edges?.length > 0) {",
+									"    const firstWebhook = response.data.webhookSubscriptions.edges[0].node;",
+									"    // Extract just the numeric ID from the GID",
+									"    const webhookId = firstWebhook.id.split('/').pop();",
+									"    pm.environment.set('shopify_webhook_id', webhookId);",
+									"    console.log('Extracted webhook_id:', webhookId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Webhook Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateWebhook($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {\n  webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {\n    webhookSubscription {\n      id\n      topic\n      format\n      endpoint {\n        __typename\n        ... on WebhookHttpEndpoint {\n          callbackUrl\n        }\n      }\n    }\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"topic\": \"PRODUCTS_UPDATE\",\n  \"webhookSubscription\": {\n    \"callbackUrl\": \"{{shopify_webhook_callback_url}}\",\n    \"format\": \"JSON\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Creates webhook. Topics: PRODUCTS_CREATE, PRODUCTS_UPDATE, PRODUCTS_DELETE, ORDERS_CREATE, INVENTORY_LEVELS_UPDATE, etc."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if webhook callback URL is not set",
+									"const callbackUrl = pm.variables.get('shopify_webhook_callback_url');",
+									"if (!callbackUrl || callbackUrl.trim() === '') {",
+									"    console.log('Skipping: shopify_webhook_callback_url not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Webhook Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Shopify-Access-Token",
+								"value": "{{shopify_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteWebhook($id: ID!) {\n  webhookSubscriptionDelete(id: $id) {\n    deletedWebhookSubscriptionId\n    userErrors {\n      field\n      message\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"gid://shopify/WebhookSubscription/{{shopify_webhook_id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "https://{{shopify_store}}.myshopify.com/admin/api/{{shopify_api_version}}/graphql.json",
+							"protocol": "https",
+							"host": [
+								"{{shopify_store}}",
+								"myshopify",
+								"com"
+							],
+							"path": [
+								"admin",
+								"api",
+								"{{shopify_api_version}}",
+								"graphql.json"
+							]
+						},
+						"description": "Deletes a webhook subscription."
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Skip if webhook_id is not set",
+									"const webhookId = pm.variables.get('shopify_webhook_id');",
+									"if (!webhookId || webhookId.trim() === '') {",
+									"    console.log('Skipping: shopify_webhook_id not set');",
+									"    pm.execution.skipRequest();",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validate successful response",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response time is acceptable', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+									"});",
+									"",
+									"pm.test('Response is valid JSON', function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test('No GraphQL errors', function () {",
+									"    const response = pm.response.json();",
+									"    if (response.errors) {",
+									"        console.log('GraphQL Errors:', JSON.stringify(response.errors));",
+									"    }",
+									"    pm.expect(response.errors).to.be.undefined;",
+									"});",
+									"",
+									"pm.test('Has data in response', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.data).to.not.be.undefined;",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.environment.set('request_timestamp', new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test('Status code is 200', function () {",
+					"    pm.response.to.have.status(200);",
+					"});",
+					"",
+					"pm.test('No GraphQL errors', function () {",
+					"    const response = pm.response.json();",
+					"    pm.expect(response.errors).to.be.undefined;",
+					"});"
+				]
+			}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Skip request if required Shopify credentials are not configured",
+					"const store = pm.variables.get('shopify_store');",
+					"const token = pm.variables.get('shopify_token');",
+					"",
+					"const hasStore = store && store.trim() !== '' && !store.includes('your-store');",
+					"const hasToken = token && token.trim() !== '' && !token.startsWith('shpat_xxxx');",
+					"",
+					"if (!hasStore || !hasToken) {",
+					"    console.log('⏭️ Skipping: Shopify credentials not configured');",
+					"    console.log('   Set shopify_store and shopify_token to run this test');",
+					"    pm.execution.skipRequest();",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "shopify_store",
+			"value": "",
+			"type": "default",
+			"description": "Store name without .myshopify.com"
+		},
+		{
+			"key": "shopify_token",
+			"value": "",
+			"type": "secret",
+			"description": "Admin API access token (shpat_...)"
+		},
+		{
+			"key": "shopify_api_version",
+			"value": "2025-01",
+			"type": "default",
+			"description": "API version (YYYY-MM)"
+		},
+		{
+			"key": "shopify_product_id",
+			"value": "",
+			"type": "default",
+			"description": "Product ID for testing"
+		},
+		{
+			"key": "shopify_variant_id",
+			"value": "",
+			"type": "default",
+			"description": "Variant ID for testing"
+		},
+		{
+			"key": "shopify_location_id",
+			"value": "",
+			"type": "default",
+			"description": "Location ID for inventory"
+		},
+		{
+			"key": "shopify_inventory_item_id",
+			"value": "",
+			"type": "default",
+			"description": "Inventory item ID"
+		},
+		{
+			"key": "shopify_collection_id",
+			"value": "",
+			"type": "default",
+			"description": "Collection ID"
+		},
+		{
+			"key": "shopify_order_id",
+			"value": "",
+			"type": "default",
+			"description": "Order ID"
+		},
+		{
+			"key": "shopify_customer_id",
+			"value": "",
+			"type": "default",
+			"description": "Customer ID"
+		},
+		{
+			"key": "shopify_metafield_id",
+			"value": "",
+			"type": "default",
+			"description": "Metafield ID"
+		},
+		{
+			"key": "shopify_bulk_operation_id",
+			"value": "",
+			"type": "default",
+			"description": "Bulk operation GID"
+		},
+		{
+			"key": "shopify_webhook_id",
+			"value": "",
+			"type": "default",
+			"description": "Webhook subscription ID"
+		},
+		{
+			"key": "shopify_webhook_callback_url",
+			"value": "",
+			"type": "default",
+			"description": "Webhook endpoint URL"
+		}
+	]
+}
