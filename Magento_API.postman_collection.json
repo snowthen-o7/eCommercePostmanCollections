@@ -8,179 +8,415 @@
 	"item": [
 		{
 			"name": "Products",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{magento_token}}",
-						"type": "text"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{magento_store_url}}rest/V1/products?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
-					"host": [
-						"{{magento_store_url}}rest"
-					],
-					"path": [
-						"V1",
-						"products"
-					],
-					"query": [
-						{
-							"key": "searchCriteria[currentPage]",
-							"value": "1"
-						},
-						{
-							"key": "searchCriteria[pageSize]",
-							"value": "10"
-						}
-					]
-				}
-			},
-			"response": [],
-			"description": "GET request - Add description here",
-			"event": [
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"// Standard response validation",
-							"pm.test(\"Status code is successful\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
-							"});",
-							"",
-							"pm.test(\"Response time is acceptable\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-							"});",
-							"",
-							"// Parse JSON if available",
-							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
-							"    pm.test(\"Response is valid JSON\", function () {",
-							"        pm.response.to.be.json;",
-							"    });",
-							"}"
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "Products (OAuth 1)",
-			"request": {
-				"auth": {
-					"type": "oauth1",
-					"oauth1": [
-						{
-							"key": "signatureMethod",
-							"value": "HMAC-SHA256",
-							"type": "string"
+					"name": "List Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/products?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "products"],
+							"query": [
+								{"key": "searchCriteria[currentPage]", "value": "1"},
+								{"key": "searchCriteria[pageSize]", "value": "10"}
+							]
 						},
+						"description": "Retrieves a paginated list of products from the catalog"
+					},
+					"event": [
 						{
-							"key": "tokenSecret",
-							"value": "6jroqjrmo5ktle239o4fz6s7tyhcpvg6 ",
-							"type": "string"
-						},
-						{
-							"key": "token",
-							"value": "e5j8p665stytxb2cuocevlrokw0xlkup",
-							"type": "string"
-						},
-						{
-							"key": "consumerSecret",
-							"value": "mgm20wlia4hs4ykj8h8kuc4zhbz8ioqm",
-							"type": "string"
-						},
-						{
-							"key": "consumerKey",
-							"value": "sgfu9zu90a5tdyc0r2d6cd2jpkinoq5p",
-							"type": "string"
-						},
-						{
-							"key": "version",
-							"value": "1.0",
-							"type": "string"
-						},
-						{
-							"key": "addParamsToHeader",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "addEmptyParamsToSign",
-							"value": false,
-							"type": "boolean"
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.items && response.items.length > 0) {",
+									"        pm.environment.set('magento_product_sku', response.items[0].sku);",
+									"        console.log('Extracted product_sku:', response.items[0].sku);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
 						}
 					]
 				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{magento_token}}",
-						"type": "text"
+				{
+					"name": "Get Product by SKU",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/products/{{magento_product_sku}}",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "products", "{{magento_product_sku}}"]
+						},
+						"description": "Retrieves a single product by its SKU"
 					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{magento_store_url}}rest/V1/store/storeGroups?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
-					"host": [
-						"{{magento_store_url}}rest"
-					],
-					"path": [
-						"V1",
-						"store",
-						"storeGroups"
-					],
-					"query": [
+					"event": [
 						{
-							"key": "searchCriteria[currentPage]",
-							"value": "1"
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const sku = pm.environment.get('magento_product_sku');",
+									"if (!sku) { console.log('Skipping: magento_product_sku not set'); pm.execution.skipRequest(); }"
+								]
+							}
 						},
 						{
-							"key": "searchCriteria[pageSize]",
-							"value": "10"
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+								]
+							}
 						}
 					]
 				}
-			},
-			"response": [],
-			"description": "GET request - Add description here",
-			"event": [
+			],
+			"description": "Product catalog endpoints"
+		},
+		{
+			"name": "Categories",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"// Standard response validation",
-							"pm.test(\"Status code is successful\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
-							"});",
-							"",
-							"pm.test(\"Response time is acceptable\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-							"});",
-							"",
-							"// Parse JSON if available",
-							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
-							"    pm.test(\"Response is valid JSON\", function () {",
-							"        pm.response.to.be.json;",
-							"    });",
-							"}"
-						]
-					}
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/categories",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "categories"]
+						},
+						"description": "Retrieves the category tree"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+									"try {",
+									"    const response = pm.response.json();",
+									"    if (response.id) {",
+									"        pm.environment.set('magento_category_id', response.id);",
+									"        console.log('Extracted category_id:', response.id);",
+									"    }",
+									"} catch(e) { }"
+								]
+							}
+						}
+					]
 				}
-			]
+			],
+			"description": "Category management endpoints"
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/orders?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "orders"],
+							"query": [
+								{"key": "searchCriteria[currentPage]", "value": "1"},
+								{"key": "searchCriteria[pageSize]", "value": "10"}
+							]
+						},
+						"description": "Retrieves a paginated list of orders. Requires sales access scope."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 401) {",
+									"    pm.test('Access denied (token lacks sales scope)', function() { pm.expect(true).to.be.true; });",
+									"} else {",
+									"    pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"    pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+									"    try {",
+									"        const response = pm.response.json();",
+									"        if (response.items && response.items.length > 0) {",
+									"            pm.environment.set('magento_order_id', response.items[0].entity_id);",
+									"            console.log('Extracted order_id:', response.items[0].entity_id);",
+									"        }",
+									"    } catch(e) { }",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/orders/{{magento_order_id}}",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "orders", "{{magento_order_id}}"]
+						},
+						"description": "Retrieves a single order by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const orderId = pm.environment.get('magento_order_id');",
+									"if (!orderId) { console.log('Skipping: magento_order_id not set'); pm.execution.skipRequest(); }"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Order management endpoints"
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "List Customers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/customers/search?searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "customers", "search"],
+							"query": [
+								{"key": "searchCriteria[currentPage]", "value": "1"},
+								{"key": "searchCriteria[pageSize]", "value": "10"}
+							]
+						},
+						"description": "Retrieves a paginated list of customers. Requires customer access scope."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 401) {",
+									"    pm.test('Access denied (token lacks customer scope)', function() { pm.expect(true).to.be.true; });",
+									"} else {",
+									"    pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"    pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+									"    try {",
+									"        const response = pm.response.json();",
+									"        if (response.items && response.items.length > 0) {",
+									"            pm.environment.set('magento_customer_id', response.items[0].id);",
+									"            console.log('Extracted customer_id:', response.items[0].id);",
+									"        }",
+									"    } catch(e) { }",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Customer by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/customers/{{magento_customer_id}}",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "customers", "{{magento_customer_id}}"]
+						},
+						"description": "Retrieves a single customer by ID"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const customerId = pm.environment.get('magento_customer_id');",
+									"if (!customerId) { console.log('Skipping: magento_customer_id not set'); pm.execution.skipRequest(); }"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Customer management endpoints"
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Get Stock Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/stockItems/{{magento_product_sku}}",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "stockItems", "{{magento_product_sku}}"]
+						},
+						"description": "Retrieves stock item information for a product"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const sku = pm.environment.get('magento_product_sku');",
+									"if (!sku) { console.log('Skipping: magento_product_sku not set'); pm.execution.skipRequest(); }"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Inventory and stock management endpoints"
+		},
+		{
+			"name": "Store",
+			"item": [
+				{
+					"name": "Get Store Config",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/store/storeConfigs",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "store", "storeConfigs"]
+						},
+						"description": "Retrieves store configuration details. Requires store access scope."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 401) {",
+									"    pm.test('Access denied (token lacks store scope)', function() { pm.expect(true).to.be.true; });",
+									"} else {",
+									"    pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"    pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Store Groups",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{magento_token}}", "type": "text"},
+							{"key": "Content-Type", "value": "application/json", "type": "text"}
+						],
+						"url": {
+							"raw": "{{magento_store_url}}/rest/V1/store/storeGroups",
+							"host": ["{{magento_store_url}}"],
+							"path": ["rest", "V1", "store", "storeGroups"]
+						},
+						"description": "Retrieves all store groups. Requires store access scope."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 401) {",
+									"    pm.test('Access denied (token lacks store scope)', function() { pm.expect(true).to.be.true; });",
+									"} else {",
+									"    pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+									"    pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			],
+			"description": "Store configuration endpoints"
 		}
 	],
 	"event": [
@@ -189,6 +425,17 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
+					"// ============================================",
+					"// SHARED PRE-REQUEST UTILITIES",
+					"// ============================================",
+					"",
+					"// Configuration",
+					"const CONFIG = {",
+					"    responseTimeThreshold: pm.variables.get('response_time_threshold') || 5000,",
+					"    platform: 'magento'",
+					"};",
+					"pm.variables.set('_config', JSON.stringify(CONFIG));",
+					"",
 					"// Skip request if required Magento credentials are not configured",
 					"const storeUrl = pm.variables.get('magento_store_url');",
 					"const token = pm.variables.get('magento_token');",
@@ -197,7 +444,7 @@
 					"const hasToken = token && token.trim() !== '' && !token.startsWith('xxxx');",
 					"",
 					"if (!hasStoreUrl || !hasToken) {",
-					"    console.log('⏭️ Skipping: Magento credentials not configured');",
+					"    console.log('Skipping: Magento credentials not configured');",
 					"    console.log('   Set magento_store_url and magento_token to run this test');",
 					"    pm.execution.skipRequest();",
 					"}",
@@ -212,12 +459,51 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"// Collection-level test script"
+					"// ============================================",
+					"// SHARED TEST UTILITIES",
+					"// ============================================",
+					"",
+					"const CONFIG = JSON.parse(pm.variables.get('_config') || '{\"responseTimeThreshold\": 5000}');",
+					"",
+					"const TestHelpers = {",
+					"    expectStatus: function(expected = 200) {",
+					"        pm.test(`Status code is ${expected}`, function() {",
+					"            pm.response.to.have.status(expected);",
+					"        });",
+					"    },",
+					"    expectStatusOneOf: function(codes = [200]) {",
+					"        pm.test(`Status code is one of [${codes.join(', ')}]`, function() {",
+					"            pm.expect(pm.response.code).to.be.oneOf(codes);",
+					"        });",
+					"    },",
+					"    expectAcceptableResponseTime: function(threshold = CONFIG.responseTimeThreshold) {",
+					"        pm.test(`Response time is below ${threshold}ms`, function() {",
+					"            pm.expect(pm.response.responseTime).to.be.below(threshold);",
+					"        });",
+					"    },",
+					"    expectJson: function() {",
+					"        pm.test('Response is valid JSON', function() {",
+					"            pm.response.to.be.json;",
+					"        });",
+					"    },",
+					"    runStandardTests: function(expectedStatus = 200) {",
+					"        this.expectStatus(expectedStatus);",
+					"        this.expectAcceptableResponseTime();",
+					"        this.expectJson();",
+					"    }",
+					"};",
+					"// TestHelpers are now available for use in request-level test scripts"
 				]
 			}
 		}
 	],
 	"variable": [
+		{
+			"key": "response_time_threshold",
+			"value": "5000",
+			"type": "default",
+			"description": "Maximum acceptable response time in milliseconds"
+		},
 		{
 			"key": "magento_store_url",
 			"value": "",

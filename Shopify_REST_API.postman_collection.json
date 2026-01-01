@@ -58,7 +58,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -144,7 +144,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -221,7 +221,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/customcollection"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -297,7 +297,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -383,7 +383,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -460,7 +460,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -576,7 +576,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -654,7 +654,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -745,7 +745,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -824,7 +824,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/metafield"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -940,7 +940,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -1037,7 +1037,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1139,7 +1139,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products"
 					},
 					"response": [],
-					"description": "GET request - Add description here"
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options."
 				},
 				{
 					"name": "Get a product variant by id",
@@ -1192,7 +1192,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -1271,7 +1271,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -1349,7 +1349,7 @@
 						"description": "https://shopify.dev/docs/admin-api/rest/reference/products/product-variant"
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "test",
@@ -1456,7 +1456,7 @@
 						}
 					},
 					"response": [],
-					"description": "GET request - Add description here",
+					"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1617,7 +1617,7 @@
 				}
 			},
 			"response": [],
-			"description": "GET request - Add description here"
+			"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options."
 		},
 		{
 			"name": "REST Shop GET",
@@ -1696,7 +1696,7 @@
 				}
 			},
 			"response": [],
-			"description": "GET request - Add description here"
+			"description": "See request description above for endpoint details. Refer to Shopify REST Admin API documentation for full parameter options."
 		}
 	],
 	"event": [
@@ -1705,6 +1705,17 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
+					"// ============================================",
+					"// SHARED PRE-REQUEST UTILITIES",
+					"// ============================================",
+					"",
+					"// Configuration",
+					"const CONFIG = {",
+					"    responseTimeThreshold: pm.variables.get('response_time_threshold') || 5000,",
+					"    platform: 'shopify-rest'",
+					"};",
+					"pm.variables.set('_config', JSON.stringify(CONFIG));",
+					"",
 					"// Skip request if required Shopify credentials are not configured",
 					"const store = pm.variables.get('shopify_store');",
 					"const token = pm.variables.get('shopify_token');",
@@ -1713,7 +1724,7 @@
 					"const hasToken = token && token.trim() !== '' && !token.startsWith('shpat_xxxx');",
 					"",
 					"if (!hasStore || !hasToken) {",
-					"    console.log('⏭️ Skipping: Shopify credentials not configured');",
+					"    console.log('Skipping: Shopify credentials not configured');",
 					"    console.log('   Set shopify_store and shopify_token to run this test');",
 					"    pm.execution.skipRequest();",
 					"}",
@@ -1728,12 +1739,51 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"// Collection-level test script"
+					"// ============================================",
+					"// SHARED TEST UTILITIES",
+					"// ============================================",
+					"",
+					"const CONFIG = JSON.parse(pm.variables.get('_config') || '{\"responseTimeThreshold\": 5000}');",
+					"",
+					"const TestHelpers = {",
+					"    expectStatus: function(expected = 200) {",
+					"        pm.test(`Status code is ${expected}`, function() {",
+					"            pm.response.to.have.status(expected);",
+					"        });",
+					"    },",
+					"    expectStatusOneOf: function(codes = [200]) {",
+					"        pm.test(`Status code is one of [${codes.join(', ')}]`, function() {",
+					"            pm.expect(pm.response.code).to.be.oneOf(codes);",
+					"        });",
+					"    },",
+					"    expectAcceptableResponseTime: function(threshold = CONFIG.responseTimeThreshold) {",
+					"        pm.test(`Response time is below ${threshold}ms`, function() {",
+					"            pm.expect(pm.response.responseTime).to.be.below(threshold);",
+					"        });",
+					"    },",
+					"    expectJson: function() {",
+					"        pm.test('Response is valid JSON', function() {",
+					"            pm.response.to.be.json;",
+					"        });",
+					"    },",
+					"    runStandardTests: function(expectedStatus = 200) {",
+					"        this.expectStatus(expectedStatus);",
+					"        this.expectAcceptableResponseTime();",
+					"        this.expectJson();",
+					"    }",
+					"};",
+					"// TestHelpers are now available for use in request-level test scripts"
 				]
 			}
 		}
 	],
 	"variable": [
+		{
+			"key": "response_time_threshold",
+			"value": "5000",
+			"type": "default",
+			"description": "Maximum acceptable response time in milliseconds"
+		},
 		{
 			"key": "shopify_store",
 			"value": "",

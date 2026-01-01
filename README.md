@@ -1,5 +1,9 @@
 # E-Commerce API Postman Collections
 
+[![API Collection Tests](https://github.com/feedonomics/ecommerce-api-postman-collections/actions/workflows/api-tests.yml/badge.svg)](https://github.com/feedonomics/ecommerce-api-postman-collections/actions/workflows/api-tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+
 A comprehensive set of Postman collections for popular e-commerce platform APIs.
 
 ## Collections
@@ -8,10 +12,10 @@ A comprehensive set of Postman collections for popular e-commerce platform APIs.
 |------------|----------|-------------|
 | [Shopify GraphQL API](#shopify-graphql-api) | 30 | Full GraphQL Admin API coverage |
 | [Shopify REST API](#shopify-rest-api) | 19 | REST Admin API endpoints |
-| [BigCommerce API](#bigcommerce-api) | 15 | Store, Catalog, Orders, Customers API |
+| [BigCommerce API](#bigcommerce-api) | 17 | Store, Catalog, Orders, Customers, Error Handling |
 | [WooCommerce API](#woocommerce-api) | 19 | Full REST API v3 coverage |
-| [Magento API](#magento-api) | 2 | Catalog API |
-| [TrustPilot API](#trustpilot-api) | 3 | Product reviews API |
+| [Magento API](#magento-api) | 10 | Products, Categories, Orders, Customers, Inventory, Store |
+| [TrustPilot API](#trustpilot-api) | 8 | Reviews, Business Units, Invitations API |
 
 ## Features
 
@@ -134,12 +138,13 @@ BigCommerce REST API v2/v3 with comprehensive catalog, order, and customer cover
 ### Structure
 
 ```
-📁 Store (1)              - Store information
+📁 Store (1)               - Store information
 📁 Products & Variants (4) - Products, variants with ID extraction
-📁 Categories (3)         - Categories and category tree
-📁 Brands (2)             - Brand management
-📁 Customers (2)          - Customer queries
-📁 Orders (3)             - Orders and order products
+📁 Categories (3)          - Categories and category tree
+📁 Brands (2)              - Brand management
+📁 Customers (2)           - Customer queries
+📁 Orders (3)              - Orders and order products
+📁 Error Handling Tests (2) - 404 and 401 negative test cases
 ```
 
 ### Authentication
@@ -202,12 +207,18 @@ The collection automatically extracts and chains:
 
 ## Magento API
 
-Magento 2 REST API.
+Magento 2 REST API with comprehensive store coverage.
 
-### Endpoints
+### Structure
 
-- List Products
-- Get Store Configuration
+```
+📁 Products (2)   - List products, get product by SKU
+📁 Categories (1) - List categories
+📁 Orders (2)     - List orders, get order by ID
+📁 Customers (2)  - List customers, get customer by ID
+📁 Inventory (1)  - Get stock items
+📁 Store (2)      - Store config, store groups
+```
 
 ### Authentication
 
@@ -215,17 +226,33 @@ Supports both:
 - **Bearer Token**: Set `magento_store_url` and `magento_token`
 - **OAuth 1.0**: Set `magento_store_url`, consumer key, consumer secret, access token, and token secret
 
+### Auto-Extracted IDs
+
+The collection automatically extracts and chains:
+- `magento_order_id` → from List Orders
+- `magento_customer_id` → from List Customers
+
 ---
 
 ## TrustPilot API
 
-TrustPilot Business API for product reviews.
+TrustPilot Business API for reviews, business units, and invitations.
 
 ### Endpoints
 
 - Auth Call (OAuth token retrieval)
 - Upsert Products
-- Get Reviews
+- Get Products
+- Get Business Unit
+- Get Product Reviews
+- Get Review by ID
+- Get Business Unit Stats
+- Create Service Review Invitation
+
+### Auto-Extracted IDs
+
+The collection automatically extracts and chains:
+- `trustpilot_review_id` → from Get Product Reviews
 
 ### Authentication
 
@@ -295,6 +322,8 @@ All variables use platform prefixes for clarity. The environment file is organiz
 | `magento_consumer_secret` | | OAuth 1.0 consumer secret |
 | `magento_access_token` | | OAuth 1.0 access token |
 | `magento_token_secret` | | OAuth 1.0 token secret |
+| `magento_order_id` | Auto | Order ID (extracted from List Orders) |
+| `magento_customer_id` | Auto | Customer ID (extracted from List Customers) |
 
 *Required for Bearer auth. Use OAuth variables instead if using OAuth 1.0.
 
@@ -308,7 +337,8 @@ All variables use platform prefixes for clarity. The environment file is organiz
 | `trustpilot_username` | ✅ | Account email |
 | `trustpilot_password` | ✅ | Account password |
 | `trustpilot_business_unit_id` | ✅ | Business Unit ID |
-| `trustpilot_access_token` | | OAuth token (from Auth Call) |
+| `trustpilot_access_token` | Auto | OAuth token (from Auth Call) |
+| `trustpilot_review_id` | Auto | Review ID (extracted from Get Product Reviews) |
 
 ---
 

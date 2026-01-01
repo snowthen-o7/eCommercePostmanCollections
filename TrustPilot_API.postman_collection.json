@@ -59,7 +59,7 @@
 				}
 			},
 			"response": [],
-			"description": "POST request - Add description here",
+			"description": "Authenticates with TrustPilot using OAuth password grant. Returns an access token to use for subsequent API calls. The token is automatically stored in the trustpilot_access_token variable.",
 			"event": [
 				{
 					"listen": "test",
@@ -75,11 +75,18 @@
 							"    pm.expect(pm.response.responseTime).to.be.below(5000);",
 							"});",
 							"",
-							"// Parse JSON if available",
+							"// Parse JSON and extract access token",
 							"if (pm.response.headers.get('Content-Type')?.includes('application/json')) {",
 							"    pm.test(\"Response is valid JSON\", function () {",
 							"        pm.response.to.be.json;",
 							"    });",
+							"    try {",
+							"        const response = pm.response.json();",
+							"        if (response.access_token) {",
+							"            pm.environment.set('trustpilot_access_token', response.access_token);",
+							"            console.log('Access token saved to trustpilot_access_token');",
+							"        }",
+							"    } catch(e) { }",
 							"}"
 						]
 					}
@@ -135,7 +142,7 @@
 				}
 			},
 			"response": [],
-			"description": "POST request - Add description here",
+			"description": "Creates or updates products in your TrustPilot business unit. Use this to sync your product catalog for review collection.",
 			"event": [
 				{
 					"listen": "test",
@@ -214,7 +221,7 @@
 				}
 			},
 			"response": [],
-			"description": "GET request - Add description here",
+			"description": "Retrieves all products registered in your TrustPilot business unit. Returns product details including SKUs, names, and review statistics.",
 			"event": [
 				{
 					"listen": "test",
@@ -240,6 +247,175 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Get Business Unit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [{"key": "token", "value": "{{trustpilot_access_token}}", "type": "string"}]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{trustpilot_host}}v1/business-units/{{trustpilot_business_unit_id}}",
+					"host": ["{{trustpilot_host}}v1"],
+					"path": ["business-units", "{{trustpilot_business_unit_id}}"]
+				},
+				"description": "Retrieves details about your business unit including name, website, and review statistics."
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+							"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Product Reviews",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [{"key": "token", "value": "{{trustpilot_access_token}}", "type": "string"}]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{trustpilot_host}}v1/private/business-units/{{trustpilot_business_unit_id}}/reviews?perPage=10",
+					"host": ["{{trustpilot_host}}v1"],
+					"path": ["private", "business-units", "{{trustpilot_business_unit_id}}", "reviews"],
+					"query": [{"key": "perPage", "value": "10"}]
+				},
+				"description": "Retrieves product reviews for your business unit."
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+							"pm.test('Response is JSON', function() { pm.response.to.be.json; });",
+							"try {",
+							"    const response = pm.response.json();",
+							"    if (response.reviews && response.reviews.length > 0) {",
+							"        pm.environment.set('trustpilot_review_id', response.reviews[0].id);",
+							"        console.log('Extracted review_id:', response.reviews[0].id);",
+							"    }",
+							"} catch(e) { }"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Review by ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [{"key": "token", "value": "{{trustpilot_access_token}}", "type": "string"}]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{trustpilot_host}}v1/reviews/{{trustpilot_review_id}}",
+					"host": ["{{trustpilot_host}}v1"],
+					"path": ["reviews", "{{trustpilot_review_id}}"]
+				},
+				"description": "Retrieves a single review by its ID."
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const reviewId = pm.environment.get('trustpilot_review_id');",
+							"if (!reviewId) { console.log('Skipping: trustpilot_review_id not set'); pm.execution.skipRequest(); }"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+							"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Business Unit Stats",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [{"key": "token", "value": "{{trustpilot_access_token}}", "type": "string"}]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{trustpilot_host}}v1/business-units/{{trustpilot_business_unit_id}}/statistics",
+					"host": ["{{trustpilot_host}}v1"],
+					"path": ["business-units", "{{trustpilot_business_unit_id}}", "statistics"]
+				},
+				"description": "Retrieves review statistics including star distribution and TrustScore."
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+							"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Create Service Review Invitation",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [{"key": "token", "value": "{{trustpilot_access_token}}", "type": "string"}]
+				},
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json", "type": "text"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"consumerEmail\": \"customer@example.com\",\n  \"consumerName\": \"Test Customer\",\n  \"referenceNumber\": \"ORDER-12345\",\n  \"locale\": \"en-US\"\n}"
+				},
+				"url": {
+					"raw": "{{trustpilot_host}}v1/private/business-units/{{trustpilot_business_unit_id}}/email-invitations",
+					"host": ["{{trustpilot_host}}v1"],
+					"path": ["private", "business-units", "{{trustpilot_business_unit_id}}", "email-invitations"]
+				},
+				"description": "Creates an email invitation for a customer to leave a service review. Modify the body with actual customer data."
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is successful', function() { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]); });",
+							"pm.test('Response is JSON', function() { pm.response.to.be.json; });"
+						]
+					}
+				}
+			]
 		}
 	],
 	"event": [
@@ -248,6 +424,17 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
+					"// ============================================",
+					"// SHARED PRE-REQUEST UTILITIES",
+					"// ============================================",
+					"",
+					"// Configuration",
+					"const CONFIG = {",
+					"    responseTimeThreshold: pm.variables.get('response_time_threshold') || 5000,",
+					"    platform: 'trustpilot'",
+					"};",
+					"pm.variables.set('_config', JSON.stringify(CONFIG));",
+					"",
 					"// Skip request if required TrustPilot credentials are not configured",
 					"const apiKey = pm.variables.get('trustpilot_api_key');",
 					"const apiSecret = pm.variables.get('trustpilot_api_secret');",
@@ -256,7 +443,7 @@
 					"const hasApiSecret = apiSecret && apiSecret.trim() !== '' && !apiSecret.startsWith('xxxx');",
 					"",
 					"if (!hasApiKey || !hasApiSecret) {",
-					"    console.log('⏭️ Skipping: TrustPilot credentials not configured');",
+					"    console.log('Skipping: TrustPilot credentials not configured');",
 					"    console.log('   Set trustpilot_api_key and trustpilot_api_secret to run this test');",
 					"    pm.execution.skipRequest();",
 					"}",
@@ -271,12 +458,51 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"// Collection-level test script"
+					"// ============================================",
+					"// SHARED TEST UTILITIES",
+					"// ============================================",
+					"",
+					"const CONFIG = JSON.parse(pm.variables.get('_config') || '{\"responseTimeThreshold\": 5000}');",
+					"",
+					"const TestHelpers = {",
+					"    expectStatus: function(expected = 200) {",
+					"        pm.test(`Status code is ${expected}`, function() {",
+					"            pm.response.to.have.status(expected);",
+					"        });",
+					"    },",
+					"    expectStatusOneOf: function(codes = [200]) {",
+					"        pm.test(`Status code is one of [${codes.join(', ')}]`, function() {",
+					"            pm.expect(pm.response.code).to.be.oneOf(codes);",
+					"        });",
+					"    },",
+					"    expectAcceptableResponseTime: function(threshold = CONFIG.responseTimeThreshold) {",
+					"        pm.test(`Response time is below ${threshold}ms`, function() {",
+					"            pm.expect(pm.response.responseTime).to.be.below(threshold);",
+					"        });",
+					"    },",
+					"    expectJson: function() {",
+					"        pm.test('Response is valid JSON', function() {",
+					"            pm.response.to.be.json;",
+					"        });",
+					"    },",
+					"    runStandardTests: function(expectedStatus = 200) {",
+					"        this.expectStatus(expectedStatus);",
+					"        this.expectAcceptableResponseTime();",
+					"        this.expectJson();",
+					"    }",
+					"};",
+					"// TestHelpers are now available for use in request-level test scripts"
 				]
 			}
 		}
 	],
 	"variable": [
+		{
+			"key": "response_time_threshold",
+			"value": "5000",
+			"type": "default",
+			"description": "Maximum acceptable response time in milliseconds"
+		},
 		{
 			"key": "trustpilot_host",
 			"value": "https://api.trustpilot.com/",
