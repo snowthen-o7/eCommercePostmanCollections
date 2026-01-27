@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "woocommerce-rest-api-20251210",
-		"name": "WooCommerce REST API",
+		"name": "SnowForge - WooCommerce REST API",
 		"description": "# WooCommerce REST API\n\nREST API endpoints for WooCommerce stores.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `woo_store_url` | ✅ | Full store URL (e.g., `https://mystore.com`) |\n| `woo_consumer_key` | ✅ | REST API consumer key (`ck_...`) |\n| `woo_consumer_secret` | ✅ | REST API consumer secret (`cs_...`) |\n\n### 2. Generate API Keys\n\n1. Go to WooCommerce → Settings → Advanced → REST API\n2. Click \"Add key\"\n3. Set permissions (Read/Write)\n4. Generate and copy the Consumer Key and Consumer Secret\n\n### 3. Authentication\n\nUses query string authentication with consumer_key and consumer_secret parameters.\n\n## Endpoints\n\n### System\n- System Status\n\n### Products\n- List Products\n- Get Product by ID\n- List Product Variations\n- Get Variation by ID\n\n### Categories\n- List Categories\n- Get Category by ID\n\n### Orders\n- List Orders\n- Get Order by ID\n\n### Customers\n- List Customers\n- Get Customer by ID\n\n### Coupons\n- List Coupons\n- Get Coupon by ID\n\n## API Documentation\n\nhttps://woocommerce.github.io/woocommerce-rest-api-docs/\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},

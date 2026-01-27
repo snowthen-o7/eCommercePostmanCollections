@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "bigcommerce-api-20251210",
-		"name": "BigCommerce API",
+		"name": "SnowForge - BigCommerce API",
 		"description": "# BigCommerce Catalog API\n\nREST API v3 endpoints for BigCommerce catalog operations.\n\n## Quick Start\n\n### 1. Set Environment Variables\n\n| Variable | Required | Description |\n|----------|----------|-------------|\n| `bigcommerce_store_hash` | \u2705 | Store hash from API path (e.g., `abc123` from stores/abc123) |\n| `bigcommerce_token` | \u2705 | API access token |\n| `bigcommerce_client_id` | \u2705 | API client ID |\n\n### 2. Get Your API Credentials\n\n1. Go to your BigCommerce Admin \u2192 Settings \u2192 API \u2192 API accounts\n2. Create an API account with appropriate scopes\n3. Copy the Access Token, Client ID, and Store Hash\n\n### 3. Authentication\n\nAll requests use two headers:\n- `X-Auth-Token`: Your API access token\n- `X-Auth-Client`: Your API client ID\n\n## Endpoints\n\n### Store\n- Get Store Information\n\n### Products & Variants\n- List Products\n- Get Product by ID\n- List Product Variants\n- Get Variant by ID\n\n### Categories\n- List Categories\n- Get Category by ID\n\n### Brands\n- List Brands\n- Get Brand by ID\n\n### Customers\n- List Customers\n- Get Customer by ID\n\n### Orders\n- List Orders\n- Get Order by ID\n\n## API Documentation\n\nhttps://developer.bigcommerce.com/docs/rest-catalog\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
